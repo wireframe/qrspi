@@ -1,0 +1,9 @@
+{
+  "name": "qrspi",
+  "version": "0.1.0",
+  "description": "A five-phase workflow (Question, Research, Structure, Plan, Implement) for scoping and executing software changes with Claude Code.",
+  "author": { "name": "Ryan Sonnek", "url": "https://github.com/wireframe" },
+  "license": "MIT",
+  "homepage": "https://github.com/wireframe/qrspi",
+  "repository": "https://github.com/wireframe/qrspi"
+}
