@@ -10,7 +10,7 @@ argument-hint: "<path to decisions folder, e.g. docs/plans/2026-03-31-my-feature
 Before doing anything else, check that the decisions artifact exists:
 - Use the Glob tool to find `$ARGUMENTS/decisions.md`
 - If it does NOT exist, STOP and tell the user: "No decisions.md found in `$ARGUMENTS/`. Run `/question` first."
-- If it DOES exist, read it and proceed.
+- If it DOES exist, read it, noting the "Research Focus Areas" section, and proceed.
 
 ## Your Role
 
@@ -18,7 +18,6 @@ Map the relevant codebase based on the "Research Focus Areas" from the decisions
 
 ## Rules
 
-- Read the decisions artifact, focusing on the "Research Focus Areas" section.
 - For EACH focus area, dispatch a parallel Explore agent with a focused prompt.
 - Be strictly documentary: no opinions, no suggestions, no "you should."
 - Capture findings with `file:line` references.

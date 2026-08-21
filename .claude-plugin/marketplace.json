@@ -5,9 +5,7 @@
   "plugins": [
     {
       "name": "qrspi",
-      "source": "./",
-      "description": "A five-phase workflow (Question, Research, Structure, Plan, Implement) for scoping and executing software changes with Claude Code.",
-      "version": "0.1.0"
+      "source": "./"
     }
   ]
 }

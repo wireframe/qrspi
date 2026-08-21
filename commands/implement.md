@@ -18,20 +18,31 @@ Execute the implementation plan directly, choosing one of the two approaches bel
 
 ## Steps
 
-1. Read `$ARGUMENTS/plan.md`
-2. Present a summary of the plan: total phases, total tasks, estimated scope.
-3. Ask the user which execution approach they prefer:
+1. Present a summary of the plan: total phases, total tasks, estimated scope.
+2. Ask the user which execution approach they prefer (details below): **Option A (Subagent-Driven)** or **Option B (Batch Execution)**.
+3. Execute the chosen approach. **Run the Quality Gate (below) at every phase boundary**, regardless of which option is chosen.
+4. As tasks complete, update the checkboxes in `$ARGUMENTS/plan.md` from `- [ ]` to `- [x]`.
 
-**Option A: Subagent-Driven (this session)**
-- Fresh subagent per task, review between tasks, fast iteration.
-- Spin up a fresh subagent per task (via the Agent tool), reviewing its diff before starting the next task.
+### Option A: Subagent-Driven
 
-**Option B: Batch Execution (this session)**
-- Execute tasks sequentially, checkpoint every 3 tasks for review.
-- Execute tasks directly in this session in task order, checkpointing for review every 3 tasks.
+Fresh subagent per task, with a two-stage review after each. Best for tasks that benefit from independent, isolated context.
 
-4. Execute the chosen approach. **Run the Quality Gate (below) at every phase boundary**, regardless of which option is chosen.
-5. As tasks complete, update the checkboxes in `$ARGUMENTS/plan.md` from `- [ ]` to `- [x]`.
+1. Read the plan once; extract every task's full text and context up front; track them (e.g. via TodoWrite).
+2. Per task: dispatch a fresh implementer subagent, handing it the full task text and context directly — never just a file path. If it asks questions, answer them before it proceeds. It implements, runs the task's verification, and self-reviews.
+3. **Spec-compliance review, then code-quality review, in that order — never the reverse.** Dispatch an independent subagent to check the diff against the task's own text only: everything asked for is present, nothing extra was added. If it finds gaps, the same implementer subagent fixes them and it re-reviews — repeat until clean.
+4. Once spec-compliant, dispatch an independent subagent to run `/code-review` on the diff. If it finds issues, the same implementer subagent fixes them and it re-reviews — repeat until approved.
+5. Never move to the next task while either review still has open issues, and never dispatch multiple implementer subagents in parallel (they'll conflict).
+6. After the last task in the plan, run one final `/code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
+
+### Option B: Batch Execution
+
+Sequential execution in this session, checkpointing for review every 3 tasks. Best for smaller, tightly-sequenced plans.
+
+1. Before starting, read the whole plan and review it critically — if it has gaps or something is unclear, raise it with the user before executing rather than guessing.
+2. Execute tasks in batches of 3 (or as sized by the user): mark each in_progress, follow its steps exactly, run its verification, mark it completed.
+3. After each batch, report what was implemented and the verification output, then say "Ready for feedback" and wait.
+4. **Stop and ask, don't guess,** when: a task hits a blocker (missing dependency, unclear instruction), or verification fails repeatedly.
+5. If the user updates the plan based on feedback, or the approach needs rethinking, re-review the updated plan (back to step 1) before continuing.
 
 ## Scope Changes Mid-Execution
 

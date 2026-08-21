@@ -14,9 +14,9 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 ## Commands
 
 - **`/question <topic>`** — Surface design decisions through structured questioning before any research or implementation. Writes `decisions.md`.
-- **`/research <plans-folder>`** — Map the relevant codebase based on the decisions artifact's research focus areas. Writes `research.md`.
-- **`/structure <plans-folder>`** — Break the work into 3-5 independently testable, revertable phases. Writes `structure.md`.
-- **`/plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by phase. Writes `plan.md`.
+- **`/research <plans-folder>`** — Research the codebase based on scoped questions from `/question`'s decisions. Writes `research.md`.
+- **`/structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
+- **`/plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
 - **`/implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary.
 
 Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
@@ -28,6 +28,8 @@ Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 /plan docs/plans/2026-01-01-rate-limiting
 /implement docs/plans/2026-01-01-rate-limiting
 ```
+
+`skills/code-review/SKILL.md` is vendored verbatim from the author's personal dotfiles so `/implement`'s quality gate works standalone; it doesn't sync automatically if the source changes.
 
 ## License
 
