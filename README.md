@@ -4,6 +4,8 @@ A five-phase workflow — **Q**uestion, **R**esearch, **S**tructure, **P**lan, *
 
 Each phase writes a markdown artifact that the next phase reads, so a change goes from a vague request to a reviewed, executed plan with a clear paper trail at every step.
 
+[![QRSPI walkthrough](https://img.youtube.com/vi/YwZR6tc7qYg/0.jpg)](https://www.youtube.com/watch?v=YwZR6tc7qYg)
+
 ## Install
 
 ```
@@ -28,8 +30,6 @@ Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 /plan docs/plans/2026-01-01-rate-limiting
 /implement docs/plans/2026-01-01-rate-limiting
 ```
-
-`skills/code-review/SKILL.md` is vendored verbatim from the author's personal dotfiles so `/implement`'s quality gate works standalone; it doesn't sync automatically if the source changes.
 
 ## License
 
