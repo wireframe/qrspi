@@ -65,38 +65,37 @@ Notes:
 
 ## Prepare Pull Request
 
-After the last plan phase is committed and its quality gate has passed, draft the pull request body from this plan's artifacts. Do this automatically — do not ask for permission to draft it.
+Applies regardless of which execution option was chosen. Runs once every phase's Quality Gate has passed and — under Option A — after its final whole-diff `/code-review` pass (step 6) has also completed. Draft the pull request body from this plan's artifacts. Do this automatically — do not ask for permission to draft it.
 
-### 1. Resolve link targets
+1. **Resolve link targets.**
+   - Resolve the repo slug: `gh repo view --json owner,name`. If this fails (not authenticated, or no `gh` remote configured), stop and tell the user: "Can't resolve the GitHub repo — run `gh auth login` or check the remote, then retry." Do not fall back to relative links.
+   - Resolve the current branch: `git rev-parse --abbrev-ref HEAD`
+   - Build a blob URL prefix: `https://github.com/{owner}/{repo}/blob/{branch}/`
+   - For every link into `$ARGUMENTS/decisions.md`, `$ARGUMENTS/research.md`, `$ARGUMENTS/structure.md`, or `$ARGUMENTS/plan.md`, use `{prefix}{path relative to repo root}` — never a bare relative path. Relative links in PR bodies resolve against the repository's default branch, not the head branch, and will 404 pre-merge.
+   - For links into a specific heading, derive the anchor from that heading's actual text using GitHub's slug rule (lowercase; strip punctuation except hyphens; spaces → hyphens) — read the heading from the file, don't guess it.
 
-- Resolve the repo slug: `gh repo view --json owner,name`
-- Resolve the current branch: `git rev-parse --abbrev-ref HEAD`
-- Build a blob URL prefix: `https://github.com/{owner}/{repo}/blob/{branch}/`
-- For every link into `decisions.md`, `research.md`, `structure.md`, or `plan.md`, use `{prefix}{path relative to repo root}` — never a bare relative path. Relative links in PR bodies resolve against the repository's default branch, not the head branch, and will 404 pre-merge.
-- For links into a specific heading, derive the anchor from that heading's actual text using GitHub's slug rule (lowercase; strip punctuation except hyphens; spaces → hyphens) — read the heading from the file, don't guess it.
-
-### 2. Draft the body
-
-Write a PR body with this structure:
+2. **Draft the body.** Write a PR body with this structure, using real content in place of every placeholder — no decision gets a footnote number reused for another:
 
 ```markdown
 ## Summary
-<2-4 sentence prose: what changed and why, in plain language>
+<2-4 sentence prose: what changed and why, in plain language. Attach [^1] inline wherever a sentence reflects a Firm decision.>
 
 ## Scope
-- [Phase 1: <name>](<structure.md blob URL>#phase-1-name) — <one-line what it did>
+- [Phase 1: <name>](<structure.md blob URL>#phase-1-name) — <one-line what it did>[^2]
 - [Phase 2: <name>](<structure.md blob URL>#phase-2-name) — <one-line what it did>
 
 ---
 
 **Artifacts:** [Decisions](<decisions.md blob URL>) · [Structure](<structure.md blob URL>) · [Research](<research.md blob URL>) · [Plan](<plan.md blob URL>)
 
-[^1]: [D<n>: <Decision Title>](<decisions.md blob URL>#d<n>-decision-title)
+[^1]: [D1: <Decision Title>](<decisions.md blob URL>#d1-decision-title)
+[^2]: [D2: <Decision Title>](<decisions.md blob URL>#d2-decision-title)
 ```
 
-- Attach a footnote (`[^n]`) only to a `Firm` decision from `decisions.md`, and only where the Summary or a Scope line actually reflects that decision — do not manufacture a mention just to attach a footnote, and do not footnote `Preference` or `Open` decisions.
-- Do not duplicate `plan.md`'s checklist or copy decision rationale into the body — link to the artifact instead.
+   - Every `[^n]` marker in the Summary or Scope must have a matching `[^n]:` definition at the bottom, numbered in the order the markers appear — never leave an orphaned definition with no reference, and never reuse a number for a different decision.
+   - Attach a footnote only to a `Firm` decision from `$ARGUMENTS/decisions.md`, and only where the Summary or a Scope line actually reflects that decision — do not manufacture a mention just to attach a footnote, and do not footnote `Preference` or `Open` decisions.
+   - Do not duplicate `plan.md`'s checklist or copy decision rationale into the body — link to the artifact instead.
 
-### 3. Offer to open the PR
+3. **Write the draft to a file.** Save the body to `$ARGUMENTS/pr-body.md` (overwrite if it already exists from a prior run).
 
-Print the drafted body to the output, then ask the user: "Open this as a PR with `gh pr create --body-file`, or would you like changes first?" Only run `gh pr create` after explicit confirmation — never open the PR unattended.
+4. **Offer to open the PR.** Print the drafted body to the output, then ask the user: "Open this as a PR with `gh pr create --body-file $ARGUMENTS/pr-body.md`, or would you like changes first?" Only run `gh pr create` after explicit confirmation — never open the PR unattended.
