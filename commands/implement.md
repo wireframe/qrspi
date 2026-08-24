@@ -62,3 +62,42 @@ After the last task of each plan phase is implemented and its tests pass — and
 Notes:
 - This gate runs at the **phase seam**, not per task. Under Option A it does not replace the per-task spec/quality reviewers — it adds a whole-phase pass (`/simplify`'s altitude view + `/code-review`'s correctness sweep) over the combined diff.
 - If either step's fixes are large or surprising, surface a short summary to the user before committing rather than silently moving on.
+
+## Prepare Pull Request
+
+Applies regardless of which execution option was chosen. Runs once every phase's Quality Gate has passed and — under Option A — after its final whole-diff `/code-review` pass (step 6) has also completed. Draft the pull request body from this plan's artifacts. Do this automatically — do not ask for permission to draft it.
+
+1. **Resolve link targets.**
+   - Resolve the repo slug: `gh repo view --json owner,name`. If this fails (not authenticated, or no `gh` remote configured), stop and tell the user: "Can't resolve the GitHub repo — run `gh auth login` or check the remote, then retry." (Include the command's actual error output when reporting this.) Do not fall back to relative links.
+   - Resolve the current branch: `git rev-parse --abbrev-ref HEAD`
+   - Build a blob URL prefix: `https://github.com/{owner}/{repo}/blob/{branch}/`
+   - For every link into `$ARGUMENTS/decisions.md`, `$ARGUMENTS/research.md`, `$ARGUMENTS/structure.md`, or `$ARGUMENTS/plan.md`, use `{prefix}{path relative to repo root}` — never a bare relative path. Relative links in PR bodies resolve against the repository's default branch, not the head branch, and will 404 pre-merge.
+   - For links into a specific heading, derive the anchor from that heading's actual text using GitHub's slug rule (lowercase; strip punctuation except hyphens; spaces → hyphens) — read the heading from the file, don't guess it.
+
+2. **Draft the body.** Write a PR body with this structure, using real content in place of every placeholder:
+
+```markdown
+## Summary
+<2-4 sentence prose: what changed and why, in plain language>
+
+## Scope
+- [Phase 1: <name>](<structure.md blob URL>#phase-1-name) — <one-line what it did>
+- [Phase 2: <name>](<structure.md blob URL>#phase-2-name) — <one-line what it did>
+
+## Decisions
+- [D1: <Decision Title>](<decisions.md blob URL>#d1-decision-title)
+- [D2: <Decision Title>](<decisions.md blob URL>#d2-decision-title)
+
+---
+
+**Artifacts:** [Decisions](<decisions.md blob URL>) · [Structure](<structure.md blob URL>) · [Research](<research.md blob URL>) · [Plan](<plan.md blob URL>)
+```
+
+   - Do NOT use markdown footnote syntax (`[^n]` / `[^n]:`) anywhere in the body — GitHub auto-appends a "↩" back-reference arrow to every footnote definition, which is unhelpful noise here. Use plain markdown links instead.
+   - List under `## Decisions`, in `decisions.md`'s own order, only the `Firm` decisions that the Summary or a Scope line actually reflects — do not list a decision the body doesn't actually reflect, and do not list `Preference` or `Open` decisions. If no Firm decision is reflected in the Summary or Scope, omit the `## Decisions` heading and list entirely.
+   - `**Artifacts:**` is the literal last line of the body — nothing follows it.
+   - Do not duplicate `plan.md`'s checklist or copy decision rationale into the body — link to the artifact instead.
+
+3. **Write the draft to a temporary file.** Save the body to a temp path via `mktemp` (e.g. `pr_body_path=$(mktemp)`).
+
+4. **Offer to open the PR.** Print the drafted body to the output, then ask the user: "Open this as a PR with `gh pr create --body-file <temp path>`, or would you like changes first?" Only run `gh pr create` after explicit confirmation — never open the PR unattended.
