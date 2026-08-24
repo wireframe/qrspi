@@ -74,26 +74,28 @@ Applies regardless of which execution option was chosen. Runs once every phase's
    - For every link into `$ARGUMENTS/decisions.md`, `$ARGUMENTS/research.md`, `$ARGUMENTS/structure.md`, or `$ARGUMENTS/plan.md`, use `{prefix}{path relative to repo root}` — never a bare relative path. Relative links in PR bodies resolve against the repository's default branch, not the head branch, and will 404 pre-merge.
    - For links into a specific heading, derive the anchor from that heading's actual text using GitHub's slug rule (lowercase; strip punctuation except hyphens; spaces → hyphens) — read the heading from the file, don't guess it.
 
-2. **Draft the body.** Write a PR body with this structure, using real content in place of every placeholder — no decision gets a footnote number reused for another:
+2. **Draft the body.** Write a PR body with this structure, using real content in place of every placeholder:
 
 ```markdown
 ## Summary
-<2-4 sentence prose: what changed and why, in plain language. Attach [^1] inline wherever a sentence reflects a Firm decision.>
+<2-4 sentence prose: what changed and why, in plain language>
 
 ## Scope
-- [Phase 1: <name>](<structure.md blob URL>#phase-1-name) — <one-line what it did>[^2]
+- [Phase 1: <name>](<structure.md blob URL>#phase-1-name) — <one-line what it did>
 - [Phase 2: <name>](<structure.md blob URL>#phase-2-name) — <one-line what it did>
+
+## Decisions
+- [D1: <Decision Title>](<decisions.md blob URL>#d1-decision-title)
+- [D2: <Decision Title>](<decisions.md blob URL>#d2-decision-title)
 
 ---
 
 **Artifacts:** [Decisions](<decisions.md blob URL>) · [Structure](<structure.md blob URL>) · [Research](<research.md blob URL>) · [Plan](<plan.md blob URL>)
-
-[^1]: [D1: <Decision Title>](<decisions.md blob URL>#d1-decision-title)
-[^2]: [D2: <Decision Title>](<decisions.md blob URL>#d2-decision-title)
 ```
 
-   - Every `[^n]` marker in the Summary or Scope must have a matching `[^n]:` definition at the bottom, numbered in the order the markers appear — never leave an orphaned definition with no reference, and never reuse a number for a different decision. This marker numbering tracks the order footnotes appear in the body, not the decision's own `D<n>` number — footnote `[^1]` can point at `D3` if D3 is the first Firm decision actually mentioned.
-   - Attach a footnote only to a `Firm` decision from `$ARGUMENTS/decisions.md`, and only where the Summary or a Scope line actually reflects that decision — do not manufacture a mention just to attach a footnote, and do not footnote `Preference` or `Open` decisions. If no Firm decision is reflected in the Summary or Scope, omit the footnote markers and the definitions block entirely.
+   - Do NOT use markdown footnote syntax (`[^n]` / `[^n]:`) anywhere in the body — GitHub auto-appends a "↩" back-reference arrow to every footnote definition, which is unhelpful noise here. Use plain markdown links instead.
+   - List under `## Decisions`, in `decisions.md`'s own order, only the `Firm` decisions that the Summary or a Scope line actually reflects — do not list a decision the body doesn't actually reflect, and do not list `Preference` or `Open` decisions. If no Firm decision is reflected in the Summary or Scope, omit the `## Decisions` heading and list entirely.
+   - `**Artifacts:**` is the literal last line of the body — nothing follows it.
    - Do not duplicate `plan.md`'s checklist or copy decision rationale into the body — link to the artifact instead.
 
 3. **Write the draft to a temporary file.** Save the body to a temp path via `mktemp` (e.g. `pr_body_path=$(mktemp)`).
