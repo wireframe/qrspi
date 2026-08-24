@@ -68,7 +68,7 @@ Notes:
 Applies regardless of which execution option was chosen. Runs once every phase's Quality Gate has passed and — under Option A — after its final whole-diff `/code-review` pass (step 6) has also completed. Draft the pull request body from this plan's artifacts. Do this automatically — do not ask for permission to draft it.
 
 1. **Resolve link targets.**
-   - Resolve the repo slug: `gh repo view --json owner,name`. If this fails (not authenticated, or no `gh` remote configured), stop and tell the user: "Can't resolve the GitHub repo — run `gh auth login` or check the remote, then retry." Do not fall back to relative links.
+   - Resolve the repo slug: `gh repo view --json owner,name`. If this fails (not authenticated, or no `gh` remote configured), stop and tell the user: "Can't resolve the GitHub repo — run `gh auth login` or check the remote, then retry." (Include the command's actual error output when reporting this.) Do not fall back to relative links.
    - Resolve the current branch: `git rev-parse --abbrev-ref HEAD`
    - Build a blob URL prefix: `https://github.com/{owner}/{repo}/blob/{branch}/`
    - For every link into `$ARGUMENTS/decisions.md`, `$ARGUMENTS/research.md`, `$ARGUMENTS/structure.md`, or `$ARGUMENTS/plan.md`, use `{prefix}{path relative to repo root}` — never a bare relative path. Relative links in PR bodies resolve against the repository's default branch, not the head branch, and will 404 pre-merge.
@@ -92,10 +92,10 @@ Applies regardless of which execution option was chosen. Runs once every phase's
 [^2]: [D2: <Decision Title>](<decisions.md blob URL>#d2-decision-title)
 ```
 
-   - Every `[^n]` marker in the Summary or Scope must have a matching `[^n]:` definition at the bottom, numbered in the order the markers appear — never leave an orphaned definition with no reference, and never reuse a number for a different decision.
-   - Attach a footnote only to a `Firm` decision from `$ARGUMENTS/decisions.md`, and only where the Summary or a Scope line actually reflects that decision — do not manufacture a mention just to attach a footnote, and do not footnote `Preference` or `Open` decisions.
+   - Every `[^n]` marker in the Summary or Scope must have a matching `[^n]:` definition at the bottom, numbered in the order the markers appear — never leave an orphaned definition with no reference, and never reuse a number for a different decision. This marker numbering tracks the order footnotes appear in the body, not the decision's own `D<n>` number — footnote `[^1]` can point at `D3` if D3 is the first Firm decision actually mentioned.
+   - Attach a footnote only to a `Firm` decision from `$ARGUMENTS/decisions.md`, and only where the Summary or a Scope line actually reflects that decision — do not manufacture a mention just to attach a footnote, and do not footnote `Preference` or `Open` decisions. If no Firm decision is reflected in the Summary or Scope, omit the footnote markers and the definitions block entirely.
    - Do not duplicate `plan.md`'s checklist or copy decision rationale into the body — link to the artifact instead.
 
-3. **Write the draft to a file.** Save the body to `$ARGUMENTS/pr-body.md` (overwrite if it already exists from a prior run).
+3. **Write the draft to a temporary file.** Save the body to a temp path via `mktemp` (e.g. `pr_body_path=$(mktemp)`).
 
-4. **Offer to open the PR.** Print the drafted body to the output, then ask the user: "Open this as a PR with `gh pr create --body-file $ARGUMENTS/pr-body.md`, or would you like changes first?" Only run `gh pr create` after explicit confirmation — never open the PR unattended.
+4. **Offer to open the PR.** Print the drafted body to the output, then ask the user: "Open this as a PR with `gh pr create --body-file <temp path>`, or would you like changes first?" Only run `gh pr create` after explicit confirmation — never open the PR unattended.
