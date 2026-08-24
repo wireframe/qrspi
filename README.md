@@ -19,7 +19,7 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 - **`/research <plans-folder>`** — Research the codebase based on scoped questions from `/question`'s decisions. Writes `research.md`.
 - **`/structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
 - **`/plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
-- **`/implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary.
+- **`/implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary. Once the plan is done, drafts a pull request body from the plan's artifacts and offers to open it with `gh pr create`.
 
 Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 
