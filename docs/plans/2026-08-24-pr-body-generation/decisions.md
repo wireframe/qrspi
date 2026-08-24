@@ -42,3 +42,5 @@ Date: 2026-08-24
 
 ## Research Focus Areas
 - How do GitHub relative links resolve in PR/issue bodies when the target file only exists on the head branch?
+- Where in `/implement` should the new PR-body-generation step be inserted?
+- What heading and cross-link conventions do the existing QRSPI artifact formats (`decisions.md`, `research.md`, `structure.md`, `plan.md`) use?

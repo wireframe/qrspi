@@ -6,7 +6,6 @@ Decisions: [decisions.md](decisions.md)
 **Findings:**
 - Relative markdown links inside a PR or issue body resolve against the repository's **default branch**, not the pull request's head branch. A link to a file that exists only on the feature branch renders as a 404 until that branch is merged into the default branch.
 - Reference: https://github.com/github/markup/issues/576
-- Reference: https://github.com/github/markup/issues/84
 - Consequence: artifact links in the PR body must be full `https://github.com/{owner}/{repo}/blob/{branch}/{path}` URLs with the head branch baked in — not bare relative paths — so they resolve correctly while the PR is still open.
 
 ## Insertion point: /implement's Quality Gate section
@@ -17,7 +16,7 @@ Decisions: [decisions.md](decisions.md)
 
 ## Artifact formats: heading and cross-link conventions
 **Findings:**
-- `commands/question.md:38-63` — `decisions.md` format: top heading `# Decisions: <topic>`; each decision is `## D<n>: <Decision Title>` with fields `**Question:**`, `**Firmness:**`, `**Options considered:**`, `**Chosen:**`, `**Rationale:**`; a trailing `## Research Focus Areas` bullet list. `decisions.md` is the first artifact in the chain and does not cross-link to any other artifact.
+- `commands/question.md:45-63` — `decisions.md` format: top heading `# Decisions: <topic>`; each decision is `## D<n>: <Decision Title>` with fields `**Question:**`, `**Firmness:**`, `**Options considered:**`, `**Chosen:**`, `**Rationale:**`; a trailing `## Research Focus Areas` bullet list. `decisions.md` is the first artifact in the chain and does not cross-link to any other artifact.
 - `commands/research.md:31-55` — `research.md` format: top heading `# Research: <topic>`; a `Decisions: [decisions.md](decisions.md)` cross-link (`commands/research.md:34`); one `## <Focus Area title>` section per decisions.md focus area with `**Findings:**` bullets; then `## Patterns Observed`, `## Constraints Discovered`, and an optional `## Open Decisions (must be resolved before /structure)` section (`commands/research.md:52-54`), included only if a decision was left `Open`.
 - `commands/structure.md:33-55` — `structure.md` format: top heading `# Structure: <topic>`; cross-links `Decisions: [decisions.md](decisions.md)` and `Research: [research.md](research.md)` (`commands/structure.md:36-37`); one `## Phase N: <name>` section per phase with `**Goal:**`, `**Files touched:**`, `**Depends on:**`, `**Verification:**`; a trailing `## Out of Scope` section.
 - `commands/plan.md:36-67` — `plan.md` format: top heading `# Plan: <topic>`; cross-links to Decisions, Research, and Structure (`commands/plan.md:39-41`); a "For Claude" execution note; summary fields `**Goal:**`, `**Architecture:**`, `**Tech Stack:**`; one `## Phase N: <name>` section per phase containing `- [ ] Task N.M: <description>` items, each with `File:`, `Change:`, `Test:` sub-bullets, closed by a plain `- [ ] Commit Phase N` line.
