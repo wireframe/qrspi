@@ -63,8 +63,12 @@ Date: YYYY-MM-DD
 ```
 
 3. Print the full contents of the written `decisions.md` to the output so the user can review it inline.
-4. Tell the user: "Decisions captured and written to `docs/plans/YYYY-MM-DD-<topic>/decisions.md`. Reply with any revisions and I'll update the file in place, or run `/qrspi:research docs/plans/YYYY-MM-DD-<topic>` to start the next phase."
+4. Run the Continue Gate below.
 
-## Revisions
+## Continue Gate
 
-If the user replies with changes after the artifact is written, apply them by editing the existing `decisions.md` file (do not ask before saving), then re-print the updated contents.
+Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session):
+
+- **"Continue to `/qrspi:research`"** (recommended, default) — no changes needed. Print the exact next command in a fenced code block: `/qrspi:research docs/plans/YYYY-MM-DD-<topic>`. End the turn — do not run it yourself.
+- **"I have revisions"** — ask what to change (free text), apply the changes by editing `decisions.md` in place (do not ask before saving), re-print the updated contents, then run this gate again.
+- **"Stop here for now"** — acknowledge and end the turn.
