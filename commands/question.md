@@ -63,7 +63,7 @@ Date: YYYY-MM-DD
 ```
 
 3. Print the full contents of the written `decisions.md` to the output so the user can review it inline.
-4. Tell the user: "Decisions captured and written to `docs/plans/YYYY-MM-DD-<topic>/decisions.md`. Reply with any revisions and I'll update the file in place, or run `/research docs/plans/YYYY-MM-DD-<topic>` to start the next phase."
+4. Tell the user: "Decisions captured and written to `docs/plans/YYYY-MM-DD-<topic>/decisions.md`. Reply with any revisions and I'll update the file in place, or run `/qrspi:research docs/plans/YYYY-MM-DD-<topic>` to start the next phase."
 
 ## Revisions
 

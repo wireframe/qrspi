@@ -9,7 +9,7 @@ argument-hint: "<path to plans folder, e.g. docs/plans/2026-03-31-my-feature>"
 
 Before doing anything else:
 - Use the Glob tool to find `$ARGUMENTS/plan.md`
-- If it does NOT exist, STOP and tell the user: "No plan.md found in `$ARGUMENTS/`. Run `/plan` first."
+- If it does NOT exist, STOP and tell the user: "No plan.md found in `$ARGUMENTS/`. Run `/qrspi:plan` first."
 - If it DOES exist, read it and proceed.
 
 ## Your Role

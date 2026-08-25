@@ -9,7 +9,7 @@ argument-hint: "<path to decisions folder, e.g. docs/plans/2026-03-31-my-feature
 
 Before doing anything else, check that the decisions artifact exists:
 - Use the Glob tool to find `$ARGUMENTS/decisions.md`
-- If it does NOT exist, STOP and tell the user: "No decisions.md found in `$ARGUMENTS/`. Run `/question` first."
+- If it does NOT exist, STOP and tell the user: "No decisions.md found in `$ARGUMENTS/`. Run `/qrspi:question` first."
 - If it DOES exist, read it, noting the "Research Focus Areas" section, and proceed.
 
 ## Your Role
@@ -56,9 +56,9 @@ Decisions: [decisions.md](decisions.md)
 
 Then print the full contents of the written `research.md` to the output so the user can review it inline.
 
-If there are Open Decisions, tell the user which ones still need a call before `/structure`, and offer to record their answers back into `decisions.md` (flipping those entries from `Open` to `Firm`/`Preference`).
+If there are Open Decisions, tell the user which ones still need a call before `/qrspi:structure`, and offer to record their answers back into `decisions.md` (flipping those entries from `Open` to `Firm`/`Preference`).
 
-Tell the user: "Research complete and written to `$ARGUMENTS/research.md`. Reply with any revisions and I'll update the file in place, or run `/structure $ARGUMENTS` to start the next phase."
+Tell the user: "Research complete and written to `$ARGUMENTS/research.md`. Reply with any revisions and I'll update the file in place, or run `/qrspi:structure $ARGUMENTS` to start the next phase."
 
 ## Revisions
 

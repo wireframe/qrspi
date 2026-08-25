@@ -15,20 +15,20 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 
 ## Commands
 
-- **`/question <topic>`** — Surface design decisions through structured questioning before any research or implementation. Writes `decisions.md`.
-- **`/research <plans-folder>`** — Research the codebase based on scoped questions from `/question`'s decisions. Writes `research.md`.
-- **`/structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
-- **`/plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
-- **`/implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary. Once the plan is done, drafts a pull request body from the plan's artifacts and offers to open it with `gh pr create`.
+- **`/qrspi:question <topic>`** — Surface design decisions through structured questioning before any research or implementation. Writes `decisions.md`.
+- **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions. Writes `research.md`.
+- **`/qrspi:structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
+- **`/qrspi:plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
+- **`/qrspi:implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary. Once the plan is done, drafts a pull request body from the plan's artifacts and offers to open it with `gh pr create`.
 
 Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 
 ```
-/question add rate limiting to the API
-/research docs/plans/2026-01-01-rate-limiting
-/structure docs/plans/2026-01-01-rate-limiting
-/plan docs/plans/2026-01-01-rate-limiting
-/implement docs/plans/2026-01-01-rate-limiting
+/qrspi:question add rate limiting to the API
+/qrspi:research docs/plans/2026-01-01-rate-limiting
+/qrspi:structure docs/plans/2026-01-01-rate-limiting
+/qrspi:plan docs/plans/2026-01-01-rate-limiting
+/qrspi:implement docs/plans/2026-01-01-rate-limiting
 ```
 
 ## License

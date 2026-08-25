@@ -9,7 +9,7 @@ argument-hint: "<path to plans folder, e.g. docs/plans/2026-03-31-my-feature>"
 
 Before doing anything else:
 - Use the Glob tool to find `$ARGUMENTS/structure.md`
-- If it does NOT exist, STOP and tell the user: "No structure.md found in `$ARGUMENTS/`. Run `/structure` first."
+- If it does NOT exist, STOP and tell the user: "No structure.md found in `$ARGUMENTS/`. Run `/qrspi:structure` first."
 - If it DOES exist, read all prior artifacts: `$ARGUMENTS/decisions.md`, `$ARGUMENTS/research.md`, and `$ARGUMENTS/structure.md`, then proceed.
 
 ## Your Role
@@ -40,7 +40,7 @@ Decisions: [decisions.md](decisions.md)
 Research: [research.md](research.md)
 Structure: [structure.md](structure.md)
 
-> **For Claude:** Execute this plan task-by-task, phase by phase — see `/implement`'s execution options.
+> **For Claude:** Execute this plan task-by-task, phase by phase — see `/qrspi:implement`'s execution options.
 
 **Goal:** <one sentence>
 **Architecture:** <2-3 sentences>
@@ -68,7 +68,7 @@ Structure: [structure.md](structure.md)
 
 Then print the full contents of the written `plan.md` to the output so the user can review it inline.
 
-Tell the user: "Plan complete and written to `$ARGUMENTS/plan.md`. Reply with any revisions and I'll update the file in place, or run `/implement $ARGUMENTS` to begin execution."
+Tell the user: "Plan complete and written to `$ARGUMENTS/plan.md`. Reply with any revisions and I'll update the file in place, or run `/qrspi:implement $ARGUMENTS` to begin execution."
 
 ## Revisions
 

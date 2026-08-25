@@ -9,7 +9,7 @@ argument-hint: "<path to plans folder, e.g. docs/plans/2026-03-31-my-feature>"
 
 Before doing anything else:
 - Use the Glob tool to find `$ARGUMENTS/research.md`
-- If it does NOT exist, STOP and tell the user: "No research.md found in `$ARGUMENTS/`. Run `/research` first."
+- If it does NOT exist, STOP and tell the user: "No research.md found in `$ARGUMENTS/`. Run `/qrspi:research` first."
 - If it DOES exist, read both `$ARGUMENTS/decisions.md` and `$ARGUMENTS/research.md`, then proceed.
 
 ## Your Role
@@ -56,7 +56,7 @@ Research: [research.md](research.md)
 
 Then print the full contents of the written `structure.md` to the output so the user can review it inline.
 
-Tell the user: "Structure defined and written to `$ARGUMENTS/structure.md`. Reply with any revisions and I'll update the file in place, or run `/plan $ARGUMENTS` to create the detailed implementation plan."
+Tell the user: "Structure defined and written to `$ARGUMENTS/structure.md`. Reply with any revisions and I'll update the file in place, or run `/qrspi:plan $ARGUMENTS` to create the detailed implementation plan."
 
 ## Revisions
 
