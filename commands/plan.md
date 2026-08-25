@@ -74,6 +74,6 @@ Run the Continue Gate below.
 
 Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session):
 
-- **"Continue to `/qrspi:implement`"** (recommended, default) — no changes needed. Print the exact next command in a fenced code block: `/qrspi:implement $ARGUMENTS`. End the turn — do not run it yourself.
+- **"Continue to `/qrspi:implement`"** (recommended, default) — no changes needed. Immediately continue in this same turn: read `${CLAUDE_PLUGIN_ROOT}/commands/implement.md` and follow its instructions, passing through this phase's own `$ARGUMENTS` (the plans folder path) as its argument. Do not end the turn, and do not wait for the user to type the command themselves.
 - **"I have revisions"** — ask what to change (free text), apply the changes by editing `plan.md` in place (do not ask before saving), re-print the updated outline, then run this gate again.
 - **"Stop here for now"** — acknowledge and end the turn.
