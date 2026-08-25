@@ -54,12 +54,16 @@ Decisions: [decisions.md](decisions.md)
 - (one entry per `Firmness: Open` decision; omit this section only if there were none)
 ```
 
-Then print the full contents of the written `research.md` to the output so the user can review it inline.
+Research findings are usually too long to dump inline. Print an outline instead: each focus area title with its finding count (e.g. `Rate limiting middleware — 4 findings`), plus whether Patterns Observed / Constraints Discovered sections have entries — not the finding bodies. Tell the user the file path (`$ARGUMENTS/research.md`) to read the full detail.
 
-If there are Open Decisions, tell the user which ones still need a call before `/qrspi:structure`, and offer to record their answers back into `decisions.md` (flipping those entries from `Open` to `Firm`/`Preference`).
+If there are Open Decisions, print those in full (title, options, tradeoffs) regardless of the outline-only rule above — the user needs that detail to resolve them — and tell the user which ones still need a call before `/qrspi:structure`, offering to record their answers back into `decisions.md` (flipping those entries from `Open` to `Firm`/`Preference`) before running the Continue Gate.
 
-Tell the user: "Research complete and written to `$ARGUMENTS/research.md`. Reply with any revisions and I'll update the file in place, or run `/qrspi:structure $ARGUMENTS` to start the next phase."
+Run the Continue Gate below.
 
-## Revisions
+## Continue Gate
 
-If the user replies with changes after the artifact is written, apply them by editing the existing `research.md` file (do not ask before saving), then re-print the updated contents.
+Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session):
+
+- **"Continue to `/qrspi:structure`"** (recommended, default) — no changes needed. Print the exact next command in a fenced code block: `/qrspi:structure $ARGUMENTS`. If unresolved Open Decisions remain, note them as a caveat in this option's text. End the turn — do not run it yourself.
+- **"I have revisions"** — ask what to change (free text), apply the changes by editing `research.md` in place (do not ask before saving), re-print the updated outline, then run this gate again.
+- **"Stop here for now"** — acknowledge and end the turn.

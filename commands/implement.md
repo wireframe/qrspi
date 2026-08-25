@@ -19,7 +19,7 @@ Execute the implementation plan directly, choosing one of the two approaches bel
 ## Steps
 
 1. Present a summary of the plan: total phases, total tasks, estimated scope.
-2. Ask the user which execution approach they prefer (details below): **Option A (Subagent-Driven)** or **Option B (Batch Execution)**.
+2. Ask which execution approach to use with the `AskUserQuestion` tool (fall back to a plain-text question if that tool isn't available in this session), offering **Option A (Subagent-Driven)** and **Option B (Batch Execution)** (details below) as the two choices, each with a one-line description of what it trades off.
 3. Execute the chosen approach. **Run the Quality Gate (below) at every phase boundary**, regardless of which option is chosen.
 4. As tasks complete, update the checkboxes in `$ARGUMENTS/plan.md` from `- [ ]` to `- [x]`.
 
@@ -100,4 +100,10 @@ Applies regardless of which execution option was chosen. Runs once every phase's
 
 3. **Write the draft to a temporary file.** Save the body to a temp path via `mktemp` (e.g. `pr_body_path=$(mktemp)`).
 
-4. **Offer to open the PR.** Print the drafted body to the output, then ask the user: "Open this as a PR with `gh pr create --body-file <temp path>`, or would you like changes first?" Only run `gh pr create` after explicit confirmation — never open the PR unattended.
+4. **Offer to open the PR.** Print the drafted body to the output, then ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no prompt if that tool isn't available in this session):
+
+   - **"Open the PR now"** (recommended, default) — run `gh pr create --body-file <temp path>`.
+   - **"I want to edit the body first"** — ask what to change (free text), apply it to the temp file, re-print the body, then run this gate again.
+   - **"Don't open a PR"** — acknowledge and end the turn.
+
+   Only run `gh pr create` after explicit confirmation via this gate — never open the PR unattended.
