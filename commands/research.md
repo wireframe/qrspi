@@ -64,6 +64,6 @@ Run the Continue Gate below.
 
 Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session):
 
-- **"Continue to `/qrspi:structure`"** (recommended, default) — no changes needed. Print the exact next command in a fenced code block: `/qrspi:structure $ARGUMENTS`. If unresolved Open Decisions remain, note them as a caveat in this option's text. End the turn — do not run it yourself.
+- **"Continue to `/qrspi:structure`"** (recommended, default) — no changes needed. If unresolved Open Decisions remain, note them as a caveat in this option's text. Immediately continue in this same turn: read `${CLAUDE_PLUGIN_ROOT}/commands/structure.md` and follow its instructions, passing through this phase's own `$ARGUMENTS` (the plans folder path) as its argument. Do not end the turn, and do not wait for the user to type the command themselves.
 - **"I have revisions"** — ask what to change (free text), apply the changes by editing `research.md` in place (do not ask before saving), re-print the updated outline, then run this gate again.
 - **"Stop here for now"** — acknowledge and end the turn.
