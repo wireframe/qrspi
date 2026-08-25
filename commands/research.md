@@ -62,8 +62,9 @@ Run the Continue Gate below.
 
 ## Continue Gate
 
-Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session):
+Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session), presenting exactly these 2 labeled options:
 
 - **"Continue to `/qrspi:structure`"** (recommended, default) — no changes needed. If unresolved Open Decisions remain, note them as a caveat in this option's text. Immediately continue in this same turn: read `${CLAUDE_PLUGIN_ROOT}/commands/structure.md` and follow its instructions, passing through this phase's own `$ARGUMENTS` (the plans folder path) as its argument. Do not end the turn, and do not wait for the user to type the command themselves.
-- **"I have revisions"** — ask what to change (free text), apply the changes by editing `research.md` in place (do not ask before saving), re-print the updated outline, then run this gate again.
 - **"Stop here for now"** — acknowledge and end the turn.
+
+If the user selects **Other** (or, in the plain-text fallback, answers with anything besides a clear continue/stop), treat the typed text as the revision — unless it's blank or whitespace-only, in which case re-run this gate unchanged. Otherwise, apply it as an edit to `research.md` in place (do not ask before saving), re-print the updated outline, then run this gate again.

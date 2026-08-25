@@ -2,7 +2,7 @@
 
 A five-phase workflow — **Q**uestion, **R**esearch, **S**tructure, **P**lan, **I**mplement — for scoping and executing software changes with [Claude Code](https://code.claude.com).
 
-Each phase writes a markdown artifact that the next phase reads, so a change goes from a vague request to a reviewed, executed plan with a clear paper trail at every step. When a phase finishes, it asks a quick continue/revise/stop question instead of expecting a typed reply — when there's nothing to change, one click gets you the next command to run.
+Each phase writes a markdown artifact that the next phase reads, so a change goes from a vague request to a reviewed, executed plan with a clear paper trail at every step. When a phase finishes, it asks a quick continue/stop question — one click gets you the next command to run — and folds revisions into that same question: type your changes as a free-text reply (`AskUserQuestion`'s built-in "Other" option) instead of picking a button, and they're applied in place without a separate follow-up turn.
 
 [![QRSPI walkthrough](https://img.youtube.com/vi/YwZR6tc7qYg/0.jpg)](https://www.youtube.com/watch?v=YwZR6tc7qYg)
 

@@ -100,10 +100,11 @@ Applies regardless of which execution option was chosen. Runs once every phase's
 
 3. **Write the draft to a temporary file.** Save the body to a temp path via `mktemp` (e.g. `pr_body_path=$(mktemp)`).
 
-4. **Offer to open the PR.** Print the drafted body to the output, then ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no prompt if that tool isn't available in this session):
+4. **Offer to open the PR.** Print the drafted body to the output, then ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise prompt if that tool isn't available in this session), presenting exactly these 2 labeled options:
 
    - **"Open the PR now"** (recommended, default) — run `gh pr create --body-file <temp path>`.
-   - **"I want to edit the body first"** — ask what to change (free text), apply it to the temp file, re-print the body, then run this gate again.
    - **"Don't open a PR"** — acknowledge and end the turn.
+
+   If the user selects **Other** (or, in the plain-text fallback, answers with anything besides a clear continue/stop), treat the typed text as the revision — unless it's blank or whitespace-only, in which case re-run this gate unchanged. Otherwise, apply it to the temp file, re-print the body, then run this gate again.
 
    Only run `gh pr create` after explicit confirmation via this gate — never open the PR unattended.
