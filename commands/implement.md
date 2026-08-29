@@ -30,9 +30,9 @@ Fresh subagent per task, with a two-stage review after each. Best for tasks that
 1. Read the plan once; extract every task's full text and context up front; track them (e.g. via TodoWrite).
 2. Per task: dispatch a fresh implementer subagent, handing it the full task text and context directly — never just a file path. If it asks questions, answer them before it proceeds. It implements, runs the task's verification, and self-reviews.
 3. **Spec-compliance review, then code-quality review, in that order — never the reverse.** Dispatch an independent subagent to check the diff against the task's own text only: everything asked for is present, nothing extra was added. If it finds gaps, the same implementer subagent fixes them and it re-reviews — repeat until clean.
-4. Once spec-compliant, dispatch an independent subagent to run `/code-review` on the diff. If it finds issues, the same implementer subagent fixes them and it re-reviews — repeat until approved.
+4. Once spec-compliant, dispatch an independent subagent to run `/code-review` and `/qrspi:code-review` on the diff. If either finds issues, the same implementer subagent fixes them and it re-reviews — repeat until both approve.
 5. Never move to the next task while either review still has open issues, and never dispatch multiple implementer subagents in parallel (they'll conflict).
-6. After the last task in the plan, run one final `/code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
+6. After the last task in the plan, run one final `/code-review` and `/qrspi:code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
 
 ### Option B: Batch Execution
 
@@ -56,11 +56,12 @@ After the last task of each plan phase is implemented and its tests pass — and
 2. **`/simplify`.** Run it to apply reuse/simplification/efficiency/altitude cleanups (it always auto-applies). This goes first so the next step isn't re-flagging the same cleanups.
 3. **Re-run the test suite.** `/simplify` mutates the working tree — reconfirm green. If it broke something, fix or revert the offending cleanup before continuing.
 4. **`/code-review --fix`.** Run it to catch correctness bugs plus any remaining quality issues and apply the fixes automatically.
-5. **Re-run the test suite.** `/code-review --fix` also mutates the tree — reconfirm green. If a fix broke a test, resolve it before committing.
-6. **Commit the phase**, including the gate's changes (fold into the phase commit, or add a follow-up `Phase N quality gate` commit if the phase was already committed task-by-task under Option A).
+5. **`/qrspi:code-review`.** Run it against the phase's Clean Code / TDD / pragmatic-programming standards; fix anything it flags.
+6. **Re-run the test suite.** `/code-review --fix` and `/qrspi:code-review` fixes also mutate the tree — reconfirm green. If a fix broke a test, resolve it before committing.
+7. **Commit the phase**, including the gate's changes (fold into the phase commit, or add a follow-up `Phase N quality gate` commit if the phase was already committed task-by-task under Option A).
 
 Notes:
-- This gate runs at the **phase seam**, not per task. Under Option A it does not replace the per-task spec/quality reviewers — it adds a whole-phase pass (`/simplify`'s altitude view + `/code-review`'s correctness sweep) over the combined diff.
+- This gate runs at the **phase seam**, not per task. Under Option A it does not replace the per-task spec/quality reviewers — it adds a whole-phase pass (`/simplify`'s altitude view + `/code-review`'s correctness sweep + `/qrspi:code-review`'s standards checklist) over the combined diff.
 - If either step's fixes are large or surprising, surface a short summary to the user before committing rather than silently moving on.
 
 ## Prepare Pull Request
