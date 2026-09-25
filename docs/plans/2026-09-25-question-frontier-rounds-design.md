@@ -62,10 +62,12 @@ Focus Areas still applies.
 
 ### 3. Firmness
 
-The existing firmness rules stay. Add one rule: **a clicked option records as
-Preference**, because a click, even on the recommended option, carries no signal
-of conviction. Text typed via "Other" is inferred with the existing rules, and
-the single follow-up question for unclear firmness still applies.
+The existing firmness rules stay. Add one rule: **accepting a recommendation
+records as Preference**. This covers a clicked option, even the recommended one,
+and a bare "yes" or number reply to a markdown round, because neither carries a
+signal of conviction. Other typed text, including "Other" answers, is inferred
+with the existing rules, and the single follow-up question for unclear firmness
+still applies.
 
 ### 4. When to stop
 
@@ -89,24 +91,31 @@ Each decision gains a dependency field:
 
 Write these as `claude plugin eval` cases
 ([docs](https://code.claude.com/docs/en/plugin-evals.md)) before editing
-`commands/question.md`, and confirm they fail against the current command. Eval
-runs are non-interactive and cannot answer an `AskUserQuestion` call, so the
-cases test the behavior before the first question and the behavior after a
-replayed history.
+`commands/question.md`, and confirm they fail against the current command.
+
+A probe run on 2026-09-25 (Claude Code 2.1.283) showed two constraints:
+
+- `AskUserQuestion` is not available inside eval runs, even when it is listed
+  in `allowed_tools`. The agent falls back to plain text, so evals exercise the
+  markdown fallback round. The picker rendering needs a manual check.
+- `context.history_file` needs a real session transcript. A hand-written JSONL
+  fails with "No conversation found". A transcript recorded by an eval run
+  (kept with `--keep-temp`) loads, and it contains no personal settings,
+  `CLAUDE.md`, or hook output, so it is safe to commit.
 
 1. **`evals/question-first-round/`**: the prompt is `/qrspi:question <topic>`.
    Graders:
    - `tool_used` asserts `AskUserQuestion` was called.
    - An `llm` rubric checks that the round's questions are independent of each
      other and that each question lists a "(Recommended)" option first.
-2. **`evals/question-decisions-output/`**: `context.history_file` replays a
-   session where rounds were answered by clicks, one answer was typed as a hard
-   requirement, and one question was a codebase fact. Graders:
-   - `file_exists` asserts that `decisions.md` was written.
-   - `regex` asserts a `**Depends on:**` line on every decision.
-   - An `llm` rubric checks that clicked answers are Preference, the typed hard
-     requirement is Firm, and the fact question appears under Research Focus
-     Areas rather than as a decision.
+2. **`evals/question-decisions-output/`**: `context.history_file` replays the
+   first round, recorded from case 1. The prompt answers it with bare "yes"
+   replies plus one typed hard requirement. Graders:
+   - `tool_used` asserts a `Write` to `decisions.md`.
+   - `tool_used` asserts that the write contains `**Depends on:**`.
+   - An `llm` rubric checks that bare "yes" answers are Preference, the typed
+     hard requirement is Firm, and Research Focus Areas holds at least one
+     codebase question.
 
 This adds the repo's first `evals/` directory.
 
