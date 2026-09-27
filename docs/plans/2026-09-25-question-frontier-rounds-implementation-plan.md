@@ -12,6 +12,13 @@
 
 ---
 
+## Deviations during execution (2026-09-27)
+
+- **Fact rule narrowed** (Task 2 review): "Never ask the user a codebase fact", since business facts only the user knows are fair to ask.
+- **`has-recommendation` tightened** (Task 2 review): Q1 and Q2 must each have their own `➡`.
+- **Rounds rule added** (Task 3): one thing per question, one unconditional recommendation, recommendation only on the `➡️` line. Case 1 had failed 0/3 judge votes on hedged recommendations; afterwards it passed 3/3 runs.
+- **Case 2 is single-turn** (Task 3, user decision): a recorded `history.jsonl` freezes a copy of `question.md`, so replays test stale text. Task 3 Steps 1–7 below (recording, `case.yaml`, answering a recorded round) were replaced by a prompt that gives the answers up front. The "Re-record a history" README section was removed.
+
 ## Background the engineer needs
 
 - **Eval docs:** https://code.claude.com/docs/en/plugin-evals.md. A case is a directory with `prompt.md` (frontmatter + prompt body), optional `case.yaml`, and `graders/*.md` (frontmatter + optional rubric body).

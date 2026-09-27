@@ -98,24 +98,28 @@ A probe run on 2026-09-25 (Claude Code 2.1.283) showed two constraints:
 - `AskUserQuestion` is not available inside eval runs, even when it is listed
   in `allowed_tools`. The agent falls back to plain text, so evals exercise the
   markdown fallback round. The picker rendering needs a manual check.
-- `context.history_file` needs a real session transcript. A hand-written JSONL
-  fails with "No conversation found". A transcript recorded by an eval run
-  (kept with `--keep-temp`) loads, and it contains no personal settings,
-  `CLAUDE.md`, or hook output, so it is safe to commit.
+- `context.history_file` replays freeze a copy of the command text recorded in
+  the transcript, so a replay keeps testing the old instructions after
+  `commands/question.md` changes. Cases therefore use single-turn prompts.
 
 1. **`evals/question-first-round/`**: the prompt is `/qrspi:question <topic>`.
    Graders:
-   - `tool_used` asserts `AskUserQuestion` was called.
-   - An `llm` rubric checks that the round's questions are independent of each
-     other and that each question lists a "(Recommended)" option first.
-2. **`evals/question-decisions-output/`**: `context.history_file` replays the
-   first round, recorded from case 1. The prompt answers it with bare "yes"
-   replies plus one typed hard requirement. Graders:
+   - `regex` asserts at least two numbered questions (`**Q1**` … `**Q2**`).
+   - `regex` asserts that Q1 and Q2 each have their own `➡` recommendation.
+   - An `llm` rubric checks that the questions are independent of each other,
+     each has a recommendation, and none asks the user for a codebase fact.
+2. **`evals/question-decisions-output/`**: a single-turn prompt runs
+   `/qrspi:question` with the answers given up front: one typed requirement
+   marked non-negotiable, "go with your recommendations" for everything else,
+   and "don't ask me anything; write it up". Graders:
    - `tool_used` asserts a `Write` to `decisions.md`.
    - `tool_used` asserts that the write contains `**Depends on:**`.
-   - An `llm` rubric checks that bare "yes" answers are Preference, the typed
-     hard requirement is Firm, and Research Focus Areas holds at least one
-     codebase question.
+   - An `llm` rubric checks that the typed requirement is the only Firm
+     decision, recommendation-filled decisions are Preference (or Open), and
+     Research Focus Areas holds at least one codebase question.
+
+   This does not replay answers to a live round, so the "bare yes" path is
+   covered only through "go with your recommendations".
 
 This adds the repo's first `evals/` directory.
 
