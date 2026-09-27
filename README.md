@@ -15,7 +15,7 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 
 ## Commands
 
-- **`/qrspi:question <topic>`** — Surface design decisions through structured questioning before any research or implementation. Writes `decisions.md`.
+- **`/qrspi:question <topic>`** — Surface design decisions in rounds: each round asks every question whose prerequisites are settled, with a recommended answer. Writes `decisions.md`.
 - **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions. Writes `research.md`.
 - **`/qrspi:structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
 - **`/qrspi:plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
@@ -30,6 +30,10 @@ Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 /qrspi:plan docs/plans/2026-01-01-rate-limiting
 /qrspi:implement docs/plans/2026-01-01-rate-limiting
 ```
+
+## Evals
+
+Behavior tests live in `evals/` and run with `claude plugin eval`. See [evals/README.md](evals/README.md).
 
 ## License
 
