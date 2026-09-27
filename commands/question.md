@@ -9,16 +9,38 @@ You are starting the QRSPI workflow for: $ARGUMENTS
 
 ## Your Role
 
-Surface design decisions through structured, iterative questioning. Ask ONE question at a time. Prefer multiple-choice options with tradeoffs when possible.
+Surface design decisions by interviewing the user in **rounds**. Model the decisions as a **design tree**: a decision can depend on other decisions being settled first. Each round asks the **frontier**: every open decision whose prerequisites are already settled.
 
 ## Rules
 
 - Do NOT read the codebase. This phase is purely about intent and decisions.
 - Do NOT suggest implementation details.
 - Ask about: scope, approach, constraints, compatibility, tradeoffs, success criteria.
-- After each answer, decide if you need more questions or have enough to proceed.
+- **Never ask the user a fact.** If the codebase can answer a question, don't ask it. Add it to "Research Focus Areas" instead. If a decision hinges on that fact, record the decision as **Open**.
 - **Capture firmness, not just the choice** (see below). Never record a casual aside, a "sure, I guess", a batch "all of them", or your own default as a firm decision.
-- When you have enough decisions, write the artifact immediately — do NOT ask for permission to write.
+- When the frontier is empty, write the artifact immediately — do NOT ask for permission to write.
+
+## Rounds
+
+- Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 options with their tradeoffs in the option descriptions. Put your recommended option first and end its label with "(Recommended)".
+- A question whose answer depends on another question still open in the same round belongs to a later round.
+- If the frontier has more than 4 questions, ask the 4 most foundational first and the rest in the next call.
+- After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch.
+- If `AskUserQuestion` isn't available in this session, ask the round as numbered markdown in this format, then end the turn and wait for the user to answer by number:
+
+  ```
+  ❓ **Q1** - **<question title>**: <question body, with options and tradeoffs>
+
+  ➡️ <your recommended answer>
+
+  ---
+
+  ❓ **Q2** - **<question title>**: ...
+
+  ➡️ ...
+  ```
+
+- **Stop when the frontier is empty**: every branch of the design tree visited, nothing silently assumed.
 
 ## Firmness
 
