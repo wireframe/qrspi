@@ -18,6 +18,7 @@
 - **`has-recommendation` tightened** (Task 2 review): Q1 and Q2 must each have their own `➡`.
 - **Rounds rule added** (Task 3): one thing per question, one unconditional recommendation, recommendation only on the `➡️` line. Case 1 had failed 0/3 judge votes on hedged recommendations; afterwards it passed 3/3 runs.
 - **Firmness rules refined** (Task 3 review): the picking rule is scoped to decision questions (a firmness follow-up's answer sets firmness directly), and a delegation rule covers "go with your recommendations". The picking rule itself is covered only by the manual picker check in Task 4 Step 2, because evals can't click or answer a round.
+- **Case 1 left flaky** (Task 3/4, user decision): after three prompt/rubric iterations (options rule, dependency rule, strict "depends" definition), case 1 still passed 1/3. The primary-goal question shapes the others, so the correct first round for this topic is often one question, which conflicts with the `multiple-questions` grader. Follow-up: choose an eval topic with truly independent first decisions. Recorded under Known issues in `evals/README.md`.
 - **Case 2 is single-turn** (Task 3, user decision): a recorded `history.jsonl` freezes a copy of `question.md`, so replays test stale text. Task 3 Steps 1–7 below (recording, `case.yaml`, answering a recorded round) were replaced by a prompt that gives the answers up front. The "Re-record a history" README section was removed.
 
 ## Background the engineer needs
