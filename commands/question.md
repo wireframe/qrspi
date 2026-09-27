@@ -24,6 +24,7 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 
 - Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 options with their tradeoffs in the option descriptions. Put your recommended option first and end its label with "(Recommended)".
 - Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is either a codebase fact (don't ask it; record the decision Open, see Rules) or a prerequisite that belongs in an earlier round — not a hedge inside the recommendation.
+- Options are mutually exclusive alternatives for that one decision: no "several of these" option and no "also tell me…" add-ons. Anything the user must answer separately is its own question. Two questions in one round never offer the same choice.
 - A question whose answer depends on another question still open in the same round belongs to a later round.
 - If the frontier has more than 4 questions, ask the 4 most foundational now; the rest stay on the frontier for the next round.
 - After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch.
