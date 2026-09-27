@@ -16,7 +16,7 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 - Do NOT read the codebase. This phase is purely about intent and decisions.
 - Do NOT suggest implementation details.
 - Ask about: scope, approach, constraints, compatibility, tradeoffs, success criteria.
-- **Never ask the user a fact.** If the codebase can answer a question, don't ask it. Add it to "Research Focus Areas" instead. If a decision hinges on that fact, record the decision as **Open**.
+- **Never ask the user a codebase fact.** If a question is about what the existing system already is or does (framework, datastore, existing middleware), don't ask it — add it to "Research Focus Areas" instead. If a decision hinges on that fact, record the decision as **Open**. Facts only the user knows (business constraints, consumers, deadlines) are fair to ask.
 - **Capture firmness, not just the choice** (see below). Never record a casual aside, a "sure, I guess", a batch "all of them", or your own default as a firm decision.
 - When the frontier is empty, write the artifact immediately — do NOT ask for permission to write.
 
@@ -24,7 +24,7 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 
 - Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 options with their tradeoffs in the option descriptions. Put your recommended option first and end its label with "(Recommended)".
 - A question whose answer depends on another question still open in the same round belongs to a later round.
-- If the frontier has more than 4 questions, ask the 4 most foundational first and the rest in the next call.
+- If the frontier has more than 4 questions, ask the 4 most foundational now; the rest stay on the frontier for the next round.
 - After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch.
 - If `AskUserQuestion` isn't available in this session, ask the round as numbered markdown in this format, then end the turn and wait for the user to answer by number:
 
