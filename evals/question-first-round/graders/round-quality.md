@@ -6,7 +6,7 @@ The final message is the first round of a design interview about adding rate lim
 
 PASS if all of these hold:
 - It asks two or more numbered questions in this one message.
-- No question's answer depends on the answer to another question in the same message.
+- No question depends on another question in the same message. A question depends on another only if its options or its recommendation would change based on that other answer, or if the message says one answer shapes or overrides another.
 - Every question is followed by a recommended answer.
 - Each question asks one thing, and its recommendation is not conditional (no "X if …, otherwise Y").
 - No question asks the user for a fact about the existing codebase, such as which web framework, middleware, or datastore is in use.
