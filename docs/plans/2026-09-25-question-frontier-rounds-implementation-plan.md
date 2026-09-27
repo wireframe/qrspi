@@ -4,7 +4,7 @@
 
 **Goal:** Change `/qrspi:question` from one question per turn to frontier rounds with recommended answers, add a `Depends on:` field to `decisions.md`, and cover both with `claude plugin eval` cases.
 
-**Architecture:** qrspi is a Claude Code plugin made of prompt files, so the "code" under change is `commands/question.md`. Tests are `claude plugin eval` cases under `evals/`: each case is a prompt plus graders that inspect the run's final message, tool calls, and trace. Case 1 checks the first round's shape. Case 2 replays that first round from a recorded transcript, answers it, and checks what gets written to `decisions.md`.
+**Architecture:** qrspi is a Claude Code plugin made of prompt files, so the "code" under change is `commands/question.md`. Tests are `claude plugin eval` cases under `evals/`: each case is a prompt plus graders that inspect the run's final message, tool calls, and trace. Case 1 checks the first round's shape. Case 2 is a single-turn prompt that gives the answers up front and checks what gets written to `decisions.md` (it originally replayed a recorded transcript; see Deviations).
 
 **Tech Stack:** Markdown prompt files, Claude Code 2.1.283+ (`claude plugin eval`).
 
@@ -17,6 +17,7 @@
 - **Fact rule narrowed** (Task 2 review): "Never ask the user a codebase fact", since business facts only the user knows are fair to ask.
 - **`has-recommendation` tightened** (Task 2 review): Q1 and Q2 must each have their own `➡`.
 - **Rounds rule added** (Task 3): one thing per question, one unconditional recommendation, recommendation only on the `➡️` line. Case 1 had failed 0/3 judge votes on hedged recommendations; afterwards it passed 3/3 runs.
+- **Firmness rules refined** (Task 3 review): the picking rule is scoped to decision questions (a firmness follow-up's answer sets firmness directly), and a delegation rule covers "go with your recommendations". The picking rule itself is covered only by the manual picker check in Task 4 Step 2, because evals can't click or answer a round.
 - **Case 2 is single-turn** (Task 3, user decision): a recorded `history.jsonl` freezes a copy of `question.md`, so replays test stale text. Task 3 Steps 1–7 below (recording, `case.yaml`, answering a recorded round) were replaced by a prompt that gives the answers up front. The "Re-record a history" README section was removed.
 
 ## Background the engineer needs

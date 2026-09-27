@@ -62,10 +62,12 @@ Focus Areas still applies.
 
 ### 3. Firmness
 
-The existing firmness rules stay. Add one rule: **accepting a recommendation
-records as Preference**. This covers a clicked option, even the recommended one,
-and a bare "yes" or number reply to a markdown round, because neither carries a
-signal of conviction. Other typed text, including "Other" answers, is inferred
+The existing firmness rules stay. Add one rule: **picking an option on a
+decision question records as Preference**. This covers a clicked option,
+recommended or not, and a bare "yes" reply to a markdown round, because neither
+carries a signal of conviction. The answer to a firmness follow-up sets firmness
+directly. A second rule covers delegation: "go with your recommendations"
+settles the remaining decisions as Preference (or Open). Other typed text, including "Other" answers, is inferred
 with the existing rules, and the single follow-up question for unclear firmness
 still applies.
 
