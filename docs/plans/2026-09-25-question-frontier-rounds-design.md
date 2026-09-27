@@ -49,6 +49,11 @@ Replaces "Ask ONE question at a time."
   and the rest in the next call.
 - After each round, recompute the frontier. Answers unblock new questions, and a
   surprising answer can reopen an earlier branch.
+- Each question asks one thing with one unconditional recommendation, and its
+  options are mutually exclusive. A question that shapes others goes in an
+  earlier round, and questions in one round never cross-reference each other.
+- A decision recorded Open counts as settled; decisions that depend on it are
+  recorded Open too rather than asked.
 - Fallback when `AskUserQuestion` is unavailable: a numbered markdown round, with
   each question as `❓ **Q1** - **<title>**: <body>` followed by a
   `➡️ <recommendation>` line, answered in free text by number.

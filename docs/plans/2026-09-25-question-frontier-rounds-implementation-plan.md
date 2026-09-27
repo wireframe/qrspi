@@ -252,6 +252,8 @@ git commit -m "Ask /question in frontier rounds with recommended answers"
 - Create: `evals/question-decisions-output/graders/firmness-and-facts.md`
 - Modify: `commands/question.md` (Firmness section, Output format)
 
+> **Superseded:** Steps 1–7 describe the abandoned history replay. Case 2 is now a single-turn prompt; see Deviations.
+
 **Step 1: Record the history**
 
 Run the "Re-record a history" commands from `evals/README.md`, starting with `mkdir -p evals/question-decisions-output`.
