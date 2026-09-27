@@ -23,7 +23,7 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 ## Rounds
 
 - Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 options with their tradeoffs in the option descriptions. Put your recommended option first and end its label with "(Recommended)".
-- Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is either a codebase fact (Research Focus Areas) or a prerequisite that belongs in an earlier round — not a hedge inside the recommendation.
+- Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is either a codebase fact (don't ask it; record the decision Open, see Rules) or a prerequisite that belongs in an earlier round — not a hedge inside the recommendation.
 - A question whose answer depends on another question still open in the same round belongs to a later round.
 - If the frontier has more than 4 questions, ask the 4 most foundational now; the rest stay on the frontier for the next round.
 - After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch.
@@ -53,10 +53,11 @@ Every decision carries a firmness level. This is the point of the phase: downstr
 
 Assigning firmness:
 - **Default to Preference, not Firm.** Only mark **Firm** when the user stated a real requirement ("non-negotiable", "must", "won't change that").
-- **Accepting a recommendation is Preference.** A clicked option, even the recommended one, or a bare "yes"/number reply to a markdown round records as **Preference**, because it carries no signal of conviction. Infer firmness from typed text, including "Other" answers, with the rules here.
+- **Picking an option is Preference.** On a decision question, a clicked option (recommended or not) or a bare "yes" reply to a markdown round records as **Preference**, because it carries no signal of conviction. Infer firmness from typed text, including "Other" answers, with the rules here. The answer to a firmness follow-up (below) sets firmness directly.
 - A drive-by suggestion ("while you're at it, also add X"), a batch answer ("all of them"), a shrug ("sure, whatever's normal"), or an answer that is itself a question ("do we even need that?") is **Preference** or **Open** — never Firm. Do NOT manufacture a rationale for it, and do NOT escalate it into a broader mandate.
 - If firmness is genuinely unclear and it matters downstream, ask ONE quick follow-up: "Is X a hard requirement, or a lean you're open to changing?"
 - Anything you decided yourself because the user didn't weigh in is **Preference** at most — record it as your default, not their requirement.
+- **Delegation settles the rest.** If the user hands the remaining decisions to you ("go with your recommendations", "wrap it up"), settle each open decision with your recommendation as **Preference**, or **Open** if it genuinely needs research, until the frontier is empty. Don't ask firmness follow-ups for delegated decisions.
 - Every **Open** decision MUST also appear under "Research Focus Areas" — research owns resolving it.
 
 ## Output
