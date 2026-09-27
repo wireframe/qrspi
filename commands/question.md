@@ -23,10 +23,11 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 ## Rounds
 
 - Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 options with their tradeoffs in the option descriptions. Put your recommended option first and end its label with "(Recommended)".
+- Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is either a codebase fact (Research Focus Areas) or a prerequisite that belongs in an earlier round — not a hedge inside the recommendation.
 - A question whose answer depends on another question still open in the same round belongs to a later round.
 - If the frontier has more than 4 questions, ask the 4 most foundational now; the rest stay on the frontier for the next round.
 - After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch.
-- If `AskUserQuestion` isn't available in this session, ask the round as numbered markdown in this format, then end the turn and wait for the user to answer by number:
+- If `AskUserQuestion` isn't available in this session, ask the round as numbered markdown in this format, with the recommendation only on the ➡️ line, then end the turn and wait for the user to answer by number:
 
   ```
   ❓ **Q1** - **<question title>**: <question body, with options and tradeoffs>
@@ -52,6 +53,7 @@ Every decision carries a firmness level. This is the point of the phase: downstr
 
 Assigning firmness:
 - **Default to Preference, not Firm.** Only mark **Firm** when the user stated a real requirement ("non-negotiable", "must", "won't change that").
+- **Accepting a recommendation is Preference.** A clicked option, even the recommended one, or a bare "yes"/number reply to a markdown round records as **Preference**, because it carries no signal of conviction. Infer firmness from typed text, including "Other" answers, with the rules here.
 - A drive-by suggestion ("while you're at it, also add X"), a batch answer ("all of them"), a shrug ("sure, whatever's normal"), or an answer that is itself a question ("do we even need that?") is **Preference** or **Open** — never Firm. Do NOT manufacture a rationale for it, and do NOT escalate it into a broader mandate.
 - If firmness is genuinely unclear and it matters downstream, ask ONE quick follow-up: "Is X a hard requirement, or a lean you're open to changing?"
 - Anything you decided yourself because the user didn't weigh in is **Preference** at most — record it as your default, not their requirement.
@@ -59,7 +61,7 @@ Assigning firmness:
 
 ## Output
 
-When you have enough decisions, create the artifact folder and write the decisions file automatically (no confirmation step):
+When the frontier is empty, create the artifact folder and write the decisions file automatically (no confirmation step):
 
 1. Create directory: `docs/plans/YYYY-MM-DD-<topic>/` (use today's date, derive a short kebab-case topic slug from the task description)
 2. Write `docs/plans/YYYY-MM-DD-<topic>/decisions.md` with this format:
@@ -70,6 +72,7 @@ Date: YYYY-MM-DD
 
 ## D1: <Decision Title>
 **Question:** <what was asked>
+**Depends on:** D<n>[, D<m>] | none
 **Firmness:** Firm | Preference | Open
 **Options considered:** <options with tradeoffs>
 **Chosen:** <selected option — or "unresolved" for Open>
