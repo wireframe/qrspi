@@ -48,11 +48,11 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 The user should be able to pick an option without asking what it means. A terse option ("Option A — simpler") forces them to guess at the implications, and a guessed answer is a weak decision.
 
 - **State the stakes in the question.** Include one clause on what this decision shapes in later phases or the end result (e.g. "Research will cover every command file or just one, depending on this answer."). Stakes point downstream, never at another question in the round.
-- **Every option description covers four things**, in 2–4 sentences:
+- **Every option description covers three things**, in 2–3 sentences:
   - **What it means** — the choice in concrete terms.
-  - **Example** — one specific case showing where this option draws the line: something it includes *and* something it excludes (e.g. "matches 2.4.1, not 2.5.0"). Use the same cases across every option in the question so the user can compare the options side by side.
   - **What follows** — how it shapes later phases or the end result.
   - **What it costs** — what the user gives up *relative to the other options*. Say so if it's hard to undo later.
+- **Add an example when the description leaves the edge cases ambiguous** — fuzzy matching rules, thresholds, formats, categories with blurry edges. Name one specific case the option includes *and* one it excludes (e.g. "matches 2.4.1, not 2.5.0"), and reuse the same cases across every option in the question so they compare side by side. Skip the example when the description already states the rule crisply (e.g. "non-archived repos only", "all repos at once"). An example that just names a placeholder instance of the rule ("an active repo is included, an archived one is not") restates the option and is noise.
 - **Make options distinguishable.** If two descriptions would still read sensibly with their labels swapped, they don't differ enough — rewrite them so each differs on a named axis (scope, risk, effort, user experience, …).
 - **Put the detail in the description**, not the label. Do not use the `preview` field.
 
@@ -66,6 +66,10 @@ Informative (do):
 - **Exact match** — Only the exact version the plugin was built against passes. E.g. rejects 2.4.1, 2.5.0, and 3.0.0. Research only needs to find where versions are compared as strings. Cost: every patch release forces users to rebuild their plugins.
 - **Same minor** — Any patch release within the same minor version passes. E.g. accepts 2.4.1; rejects 2.5.0 and 3.0.0. Research has to find how versions are parsed. Cost: assumes patch releases never break plugins, and nothing enforces that.
 - **Same major** — Any release within the same major version passes. E.g. accepts 2.4.1 and 2.5.0; rejects 3.0.0. Research has to find how versions are parsed. Cost: a minor release that changes the plugin API would break plugins without warning; tightening the check later rejects plugins that already passed.
+
+No example needed — "Who gets the new CSV export button?" Each description already states the rule, so an example ("an admin sees it, a viewer doesn't") would only restate it:
+- **Admins only** — Only users with the admin role see the button. Research only needs to find where admin-only UI is gated. Cost: everyone else has to ask an admin for exports.
+- **Every signed-in user** — Anyone who can view the data can export it. Cost: exports leave the app with no review, so this is hard to walk back once people depend on it.
 
 **Clarification replies are not answers.** If the user responds via "Other" with a question about the options ("what's the difference?", "what would B look like?"), record nothing. Answer it by re-asking the same question with expanded descriptions that address what they asked.
 
