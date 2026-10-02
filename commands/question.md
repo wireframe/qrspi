@@ -9,16 +9,38 @@ You are starting the QRSPI workflow for: $ARGUMENTS
 
 ## Your Role
 
-Surface design decisions through structured, iterative questioning. Ask ONE question at a time. Prefer multiple-choice options with tradeoffs when possible.
+Surface design decisions through structured, iterative questioning. Ask ONE question at a time. Prefer multiple-choice options when possible, written per **Writing Options** below.
 
 ## Rules
 
 - Do NOT read the codebase. This phase is purely about intent and decisions.
-- Do NOT suggest implementation details.
+- Do NOT decide implementation details. DO describe each option's consequences concretely — illustrating what a choice leads to is not proposing an implementation.
 - Ask about: scope, approach, constraints, compatibility, tradeoffs, success criteria.
 - After each answer, decide if you need more questions or have enough to proceed.
 - **Capture firmness, not just the choice** (see below). Never record a casual aside, a "sure, I guess", a batch "all of them", or your own default as a firm decision.
 - When you have enough decisions, write the artifact immediately — do NOT ask for permission to write.
+
+## Writing Options
+
+The user should be able to pick an option without asking what it means. A terse option ("Option A — simpler") forces them to guess at the implications, and a guessed answer is a weak decision.
+
+- **State the stakes in the question.** Include one clause on what this decision shapes downstream (e.g. "This decides whether research covers every command file or just one.").
+- **Every option description covers three things**, in 2–3 sentences:
+  - **What it means** — the choice in concrete terms, with a short example of what the user would see, get, or experience.
+  - **What follows** — how it shapes later phases or the end result.
+  - **What it costs** — what the user gives up *relative to the other options*. Say so if it's hard to undo later.
+- **Make options distinguishable.** If two descriptions would still read sensibly with their labels swapped, they don't differ enough — rewrite them so each differs on a named axis (scope, risk, effort, user experience, …).
+- **Put the detail in the description**, not the label. Do not use the `preview` field.
+
+Terse (don't):
+- **Rely on "Other"** — simpler
+- **Labeled hint** — more discoverable
+
+Informative (do):
+- **Rely on "Other"** — You type revisions straight into the gate's built-in free-text field (e.g. "rename D2 to …") and they're applied in the same turn. Every gate stays a single tool call. Cost: "Other" is a generic tool label, so a first-time user may not realize revisions go there.
+- **Labeled hint** — A third option reads "I have revisions (type via Other)", pointing users at the free-text field. Revisions become discoverable at a glance. Cost: adds a button that does nothing on its own — the text still goes through "Other".
+
+**Clarification replies are not answers.** If the user responds via "Other" with a question about the options ("what's the difference?", "what would B look like?"), record nothing. Answer it by re-asking the same question with expanded descriptions that address what they asked.
 
 ## Firmness
 
