@@ -48,20 +48,24 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 The user should be able to pick an option without asking what it means. A terse option ("Option A — simpler") forces them to guess at the implications, and a guessed answer is a weak decision.
 
 - **State the stakes in the question.** Include one clause on what this decision shapes in later phases or the end result (e.g. "Research will cover every command file or just one, depending on this answer."). Stakes point downstream, never at another question in the round.
-- **Every option description covers three things**, in 2–3 sentences:
-  - **What it means** — the choice in concrete terms, with a short example of what the user would see, get, or experience.
+- **Every option description covers four things**, in 2–4 sentences:
+  - **What it means** — the choice in concrete terms.
+  - **Example** — one specific case showing where this option draws the line: something it includes *and* something it excludes (e.g. "matches 2.4.1, not 2.5.0"). Use the same cases across every option in the question so the user can compare the options side by side.
   - **What follows** — how it shapes later phases or the end result.
   - **What it costs** — what the user gives up *relative to the other options*. Say so if it's hard to undo later.
 - **Make options distinguishable.** If two descriptions would still read sensibly with their labels swapped, they don't differ enough — rewrite them so each differs on a named axis (scope, risk, effort, user experience, …).
 - **Put the detail in the description**, not the label. Do not use the `preview` field.
 
+Question: "Which plugin versions should the compatibility check accept for a plugin built against 2.4.0? Research will look at either version parsing or just string comparison, depending on this answer."
+
 Terse (don't):
-- **Rely on "Other"** — simpler
-- **Labeled hint** — more discoverable
+- **Exact match** — strictest
+- **Same major** — more flexible
 
 Informative (do):
-- **Rely on "Other"** — You type revisions straight into the gate's built-in free-text field (e.g. "rename D2 to …") and they're applied in the same turn. Every gate stays a single tool call. Cost: "Other" is a generic tool label, so a first-time user may not realize revisions go there.
-- **Labeled hint** — A third option reads "I have revisions (type via Other)", pointing users at the free-text field. Revisions become discoverable at a glance. Cost: adds a button that does nothing on its own — the text still goes through "Other".
+- **Exact match** — Only the exact version the plugin was built against passes. E.g. rejects 2.4.1, 2.5.0, and 3.0.0. Research only needs to find where versions are compared as strings. Cost: every patch release forces users to rebuild their plugins.
+- **Same minor** — Any patch release within the same minor version passes. E.g. accepts 2.4.1; rejects 2.5.0 and 3.0.0. Research has to find how versions are parsed. Cost: assumes patch releases never break plugins, and nothing enforces that.
+- **Same major** — Any release within the same major version passes. E.g. accepts 2.4.1 and 2.5.0; rejects 3.0.0. Research has to find how versions are parsed. Cost: a minor release that changes the plugin API would break plugins without warning; tightening the check later rejects plugins that already passed.
 
 **Clarification replies are not answers.** If the user responds via "Other" with a question about the options ("what's the difference?", "what would B look like?"), record nothing. Answer it by re-asking the same question with expanded descriptions that address what they asked.
 
