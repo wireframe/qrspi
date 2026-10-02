@@ -9,22 +9,45 @@ You are starting the QRSPI workflow for: $ARGUMENTS
 
 ## Your Role
 
-Surface design decisions through structured, iterative questioning. Ask ONE question at a time. Prefer multiple-choice options when possible, written per **Writing Options** below.
+Surface design decisions by interviewing the user in **rounds**. Model the decisions as a **design tree**: a decision can depend on other decisions being settled first. Each round asks the **frontier**: every unsettled decision whose prerequisites are already settled. Write every option per **Writing Options** below.
 
 ## Rules
 
 - Do NOT read the codebase. This phase is purely about intent and decisions.
 - Do NOT decide implementation details. DO describe each option's consequences concretely — illustrating what a choice leads to is not proposing an implementation.
 - Ask about: scope, approach, constraints, compatibility, tradeoffs, success criteria.
-- After each answer, decide if you need more questions or have enough to proceed.
+- **Never ask the user a codebase fact.** If a question is about what the existing system already is or does (framework, datastore, existing middleware), don't ask it — add it to "Research Focus Areas" instead. If a decision hinges on that fact, record the decision as **Open**. Facts only the user knows (business constraints, consumers, deadlines) are fair to ask.
 - **Capture firmness, not just the choice** (see below). Never record a casual aside, a "sure, I guess", a batch "all of them", or your own default as a firm decision.
-- When you have enough decisions, write the artifact immediately — do NOT ask for permission to write.
+- When the interview stops (see Rounds), write the artifact immediately — do NOT ask for permission to write.
+
+## Rounds
+
+- Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 mutually exclusive options for that one decision, with their tradeoffs in the option descriptions (see Writing Options) — no "several of these" option and no "also tell me…" add-ons. Put your recommended option first and end its label with "(Recommended)".
+- Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is either a codebase fact (don't ask it; record the decision Open, see Rules) or a prerequisite that belongs in an earlier round — not a hedge inside the recommendation. Anything the user must answer separately is its own question.
+- Hold a question for a later round if its options or recommendation would change based on another unsettled answer; ask shaping questions (a primary goal, an urgency driver) first. Two questions in one round never offer the same choice or cross-reference each other ("this decides…", "could override Q3").
+- If the frontier has more than 4 questions, ask the 4 most foundational now; the rest stay on the frontier for the next round.
+- After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch. A decision recorded **Open** counts as settled: record each decision that depends on it as **Open** too, with `Depends on:` pointing at it, instead of asking it.
+- If `AskUserQuestion` isn't available in this session, ask the round as numbered markdown in this format, with the recommendation only on the ➡️ line, then end the turn and wait for the user to answer by number:
+
+  ```
+  ❓ **Q1** - **<question title>**: <question body, with options and tradeoffs>
+
+  ➡️ <your recommended answer>
+
+  ---
+
+  ❓ **Q2** - **<question title>**: ...
+
+  ➡️ ...
+  ```
+
+- **Stop when the frontier is empty**: every branch of the design tree visited, nothing silently assumed.
 
 ## Writing Options
 
 The user should be able to pick an option without asking what it means. A terse option ("Option A — simpler") forces them to guess at the implications, and a guessed answer is a weak decision.
 
-- **State the stakes in the question.** Include one clause on what this decision shapes downstream (e.g. "This decides whether research covers every command file or just one.").
+- **State the stakes in the question.** Include one clause on what this decision shapes in later phases or the end result (e.g. "Research will cover every command file or just one, depending on this answer."). Stakes point downstream, never at another question in the round.
 - **Every option description covers three things**, in 2–3 sentences:
   - **What it means** — the choice in concrete terms, with a short example of what the user would see, get, or experience.
   - **What follows** — how it shapes later phases or the end result.
@@ -52,14 +75,16 @@ Every decision carries a firmness level. This is the point of the phase: downstr
 
 Assigning firmness:
 - **Default to Preference, not Firm.** Only mark **Firm** when the user stated a real requirement ("non-negotiable", "must", "won't change that").
+- **Picking an option is Preference.** On a decision question, a clicked option (recommended or not) or a bare "yes" or number reply to a markdown round records as **Preference**, because it carries no signal of conviction. Infer firmness from typed text, including "Other" answers, with the rules here. The answer to a firmness follow-up (below) sets firmness directly.
 - A drive-by suggestion ("while you're at it, also add X"), a batch answer ("all of them"), a shrug ("sure, whatever's normal"), or an answer that is itself a question ("do we even need that?") is **Preference** or **Open** — never Firm. Do NOT manufacture a rationale for it, and do NOT escalate it into a broader mandate.
 - If firmness is genuinely unclear and it matters downstream, ask ONE quick follow-up: "Is X a hard requirement, or a lean you're open to changing?"
 - Anything you decided yourself because the user didn't weigh in is **Preference** at most — record it as your default, not their requirement.
+- **Delegation settles the rest.** If the user hands the remaining decisions to you ("go with your recommendations", "wrap it up"), settle each remaining decision with your recommendation as **Preference**, or **Open** if it genuinely needs research, until the frontier is empty. Don't ask firmness follow-ups for delegated decisions.
 - Every **Open** decision MUST also appear under "Research Focus Areas" — research owns resolving it.
 
 ## Output
 
-When you have enough decisions, create the artifact folder and write the decisions file automatically (no confirmation step):
+When the interview stops (see Rounds), create the artifact folder and write the decisions file automatically (no confirmation step):
 
 1. Create directory: `docs/plans/YYYY-MM-DD-<topic>/` (use today's date, derive a short kebab-case topic slug from the task description)
 2. Write `docs/plans/YYYY-MM-DD-<topic>/decisions.md` with this format:
@@ -70,6 +95,7 @@ Date: YYYY-MM-DD
 
 ## D1: <Decision Title>
 **Question:** <what was asked>
+**Depends on:** D<n>[, D<m>] | none
 **Firmness:** Firm | Preference | Open
 **Options considered:** <options with tradeoffs>
 **Chosen:** <selected option — or "unresolved" for Open>
