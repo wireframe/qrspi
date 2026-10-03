@@ -19,7 +19,7 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 - **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions. Writes `research.md`.
 - **`/qrspi:structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
 - **`/qrspi:plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
-- **`/qrspi:implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary. Once the plan is done, drafts a pull request body from the plan's artifacts and offers to open it with `gh pr create`.
+- **`/qrspi:implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary. Once the plan is done, drafts a pull request body from the plan's artifacts and opens it with `gh pr create`. Runs unattended from start to PR — review happens on the PR — stopping early only if a task is blocked.
 
 Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 
