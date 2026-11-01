@@ -11,14 +11,14 @@ Structure: [structure.md](structure.md)
 **Tech Stack:** Claude Code plugin markdown (commands, agents, skills), `claude plugin eval`, Bash fixture scripts, `jq`.
 
 Shared commands used in Test lines:
-- `EVAL_IMPL` = `claude plugin eval . --ablation none --no-publish --scaffold --runs 1 --allow-tools Write Edit Bash SendMessage`
+- `EVAL_IMPL` = `claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash SendMessage` (`--trust-plugin` because a non-terminal run can't answer the trust prompt)
 - Static checks run from the repo root.
 
 ---
 
 ## Phase 1: Implement eval baseline
 
-- [ ] Task 1.1: Fixture repo scaffold for the dispatch case
+- [x] Task 1.1: Fixture repo scaffold for the dispatch case
   - File: `evals/implement-dispatch/fixture.sh` (new, executable)
   - Change: A Bash script (`set -euo pipefail`) that runs in the empty workspace and does the following:
     - Runs `git init -q -b main` and sets local `user.name`/`user.email`.
@@ -32,24 +32,24 @@ Shared commands used in Test lines:
     - Finishes with `git add -A && git commit -qm "fixture"`.
   - Test: `tmp=$(mktemp -d) && (cd "$tmp" && bash /Users/ryansonnek/Projects/qrspi/evals/implement-dispatch/fixture.sh && bash test.sh && git log --oneline | wc -l)` prints `1`
 
-- [ ] Task 1.2: Dispatch case definition
+- [x] Task 1.2: Dispatch case definition
   - File: `evals/implement-dispatch/case.yaml` (new), `evals/implement-dispatch/prompt.md` (new)
   - Change:
     - `case.yaml`: `schema_version: "1.1"`, `name: implement-dispatch`, `context.scaffold_script: fixture.sh`.
-    - `prompt.md` frontmatter: `description` (runs implement on a 2-task fixture plan), `max_turns: 200`, `timeout_seconds: 3600`, `allowed_tools: [Read, Glob, Grep, Skill, Agent, TodoWrite, Write, Edit, Bash, SendMessage]`.
+    - `prompt.md` frontmatter: `description` (runs implement on a 2-task fixture plan), `max_turns: 200`, `timeout_seconds: 1200` (lowered from 3600 at the Phase 1 gate; observed runs take ~5 min), `allowed_tools: [Read, Glob, Grep, Skill, Agent, TodoWrite, Write, Edit, Bash, SendMessage]`.
     - `prompt.md` body: `/qrspi:implement docs/plans/2026-01-01-greeting`.
   - Test: `grep -c 'scaffold_script: fixture.sh' evals/implement-dispatch/case.yaml` prints `1`
 
-- [ ] Task 1.3: Characterization graders that pass on today's behavior
+- [x] Task 1.3: Characterization graders that pass on today's behavior
   - File: `evals/implement-dispatch/graders/tasks-ticked.md`, `graders/phase-committed.md`, `graders/dispatched-agents.md`, `graders/greeting-works.md` (all new)
   - Change:
-    - `tasks-ticked`: `type: regex`, `target: { source: file, path: docs/plans/2026-01-01-greeting/plan.md }`, `pattern: '- \[x\] Task 1\.2'`.
+    - `tasks-ticked`: `type: regex`, `target: { source: file, path: docs/plans/2026-01-01-greeting/plan.md }`, `pattern: '- \[x\] Task 1\.1[\s\S]*- \[x\] Task 1\.2'` (both tasks; tightened at the Phase 1 gate).
     - `phase-committed`: `type: tool_used`, `tool: Bash`, `input_match: 'git commit'`.
     - `dispatched-agents`: `type: tool_used`, `tool: Agent`, `min: 2`.
-    - `greeting-works`: `type: regex`, `target: trace`, `pattern: 'Hello, world'`. This confirms the run executed the new behavior.
+    - `greeting-works`: `type: regex`, `target: { source: file, path: greet.sh }`, `pattern: 'world'`. Grades the script itself, because `Hello, world` also appears in the fixture's plan text and would match the trace even if nothing ran (changed after review).
   - Test: `EVAL_IMPL --case implement-dispatch` passes all four graders on the current `commands/implement.md`. Expect it to end at the Open Pull Request step with "Can't resolve the GitHub repo", because the fixture has no remote.
 
-- [ ] Task 1.4: Spike on what graders can see, recorded as temporary graders
+- [x] Task 1.4: Spike on what graders can see, recorded as temporary graders
   - File: `evals/implement-dispatch/graders/spike-agent-input.md`, `graders/spike-sidechain.md`, `graders/spike-builtin-skills.md` (new, temporary)
   - Change:
     - `spike-agent-input`: `type: tool_used`, `tool: Agent`, `input_match: '"prompt"'`. Shows whether Agent inputs can be matched at all.
@@ -58,7 +58,7 @@ Shared commands used in Test lines:
     - Run `EVAL_IMPL --case implement-dispatch`. Note each spike's pass or fail, then delete the three spike files.
   - Test: `ls evals/implement-dispatch/graders/spike-* 2>/dev/null | wc -l` prints `0` after recording results in Task 1.5
 
-- [ ] Task 1.5: Document implement evals and spike results
+- [x] Task 1.5: Document implement evals and spike results
   - File: `evals/README.md`
   - Change:
     - Add an "Implement cases" section with the `EVAL_IMPL` run command, and say why each flag is there: `--scaffold` for the fixture repo; Bash/Edit/SendMessage because implement runs tests, edits and relays fixes.
@@ -68,7 +68,7 @@ Shared commands used in Test lines:
     - If `spike-builtin-skills` failed, add it under Known issues: the Quality Gate's `/simplify` and `/code-review` can't run in evals.
   - Test: `grep -c 'implement-dispatch' evals/README.md` prints at least `1`
 
-- [ ] Commit Phase 1
+- [x] Commit Phase 1
 
 ## Phase 2: Role agents dispatched from the main thread
 
