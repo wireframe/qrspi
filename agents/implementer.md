@@ -16,7 +16,7 @@ If the task text is ambiguous, names code that doesn't exist, or needs a depende
 
 Reply in exactly one of three formats:
 
-- `DONE`: only when the task's Test passes. A short summary of what changed, the list of files changed, and the Test command with the last few lines of its passing output.
+- `DONE`: only when the task's Test passes. A short summary of what changed, the list of every file changed for this task (cumulative across fix rounds, including any earlier implementer's files you were given), and the Test command with the last few lines of its passing output.
 - `QUESTION`: the specific question and the options you see. The main thread answers it from the plan's artifacts, then you resume.
 - `FAILED`: the Test still fails after trying. What you tried and the last 30 lines of the failing output.
 

@@ -1,5 +1,5 @@
 ---
 type: tool_used
 tool: Bash
-input_match: 'git commit'
+input_match: 'git(\s+-[cC]\s+\S+)*\s+commit\b'
 ---
