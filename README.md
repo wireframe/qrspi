@@ -19,7 +19,7 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 - **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions. Writes `research.md`.
 - **`/qrspi:structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
 - **`/qrspi:plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
-- **`/qrspi:implement <plans-folder>`** — Execute the plan, running a quality gate (`/simplify` + `/code-review`) at every phase boundary. Once the plan is done, drafts a pull request body from the plan's artifacts and opens it with `gh pr create`. Runs unattended from start to PR — review happens on the PR — stopping early only if a task is blocked.
+- **`/qrspi:implement <plans-folder>`** — Execute the plan, dispatching each task's implementer and reviewers as subagents on pinned models (see [Models](#models)). A quality gate runs in a subagent after each phase, then a final whole-diff pass before the PR. Once the plan is done, drafts a pull request body from the plan's artifacts and opens it with `gh pr create`. Runs unattended from start to PR — review happens on the PR — stopping early only if a task is blocked.
 
 Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 
@@ -30,6 +30,22 @@ Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 /qrspi:plan docs/plans/2026-01-01-rate-limiting
 /qrspi:implement docs/plans/2026-01-01-rate-limiting
 ```
+
+## Models
+
+`/qrspi:implement` dispatches each role as a plugin agent with a pinned model:
+
+| Agent | Role | Model |
+| --- | --- | --- |
+| `qrspi:implementer` | Implements a task; a stuck one is retried once on Opus before the task blocks | Sonnet (Opus on escalation) |
+| `qrspi:spec-reviewer` | Read-only check of a task against its spec | Haiku |
+| `qrspi:quality-reviewer` | Runs `/qrspi:code-review` on a task | Sonnet |
+| `qrspi:quality-gate` | Runs the phase Quality Gate and the final pass | Session model (`inherit`) |
+
+- Model precedence: the Agent call's `model` parameter, then the agent file's `model:` frontmatter, then `CLAUDE_CODE_SUBAGENT_MODEL`, then the session model.
+- `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` overrides every pin.
+- To change one role, edit `model:` in its `agents/<name>.md`; the escalation model is the `model: opus` in `commands/implement.md`.
+- The quality gate nests three subagent layers, so keep `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` at its default of 3 or higher.
 
 ## Evals
 

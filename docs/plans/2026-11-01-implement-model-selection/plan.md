@@ -213,7 +213,7 @@ Shared commands used in Test lines:
 
 ## Phase 5: Docs, version, and comparison run
 
-- [ ] Task 5.1: README describes role models
+- [x] Task 5.1: README describes role models
   - File: `README.md:21`, plus a new "Models" section after Commands
   - Change:
     - Update the implement bullet: per-task roles on pinned models, Opus escalation before blocking, and seam reviews at pinned `/code-review` effort in subagents.
@@ -221,12 +221,12 @@ Shared commands used in Test lines:
     - It notes that `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` overrides every pin, and that the Quality Gate needs the default subagent spawn depth of 3 (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`).
   - Test: `grep -c 'qrspi:implementer' README.md` prints at least `1` and `grep -c 'CLAUDE_CODE_SUBAGENT_MODEL_FORCE' README.md` prints `1`
 
-- [ ] Task 5.2: Version bump
+- [x] Task 5.2: Version bump
   - File: `.claude-plugin/plugin.json:3`
   - Change: `0.5.0` → `0.6.0`.
   - Test: `jq -r .version .claude-plugin/plugin.json` prints `0.6.0`
 
-- [ ] Task 5.3: Comparison run, old vs new implement
+- [x] Task 5.3: Comparison run, old vs new implement
   - File: `docs/plans/2026-11-01-implement-model-selection/comparison.md` (new)
   - Change:
     - Plugin checkouts: in the scratchpad, `git worktree add` an old plugin checkout at `02e7cb8` and a new one at this branch's HEAD.
@@ -237,10 +237,12 @@ Shared commands used in Test lines:
     - Remove the scratch worktrees.
   - Test: `grep -c 'total_cost_usd\|Cost' docs/plans/2026-11-01-implement-model-selection/comparison.md` prints at least `1` and `git worktree list | wc -l` prints `1`
   - Note: Serves Preference decisions D4/D15. It costs two full Opus-session runs, so confirm before running.
+  - (During execution: the user approved this up front. `--safe-mode` also turned off `--plugin-dir`, so the installed qrspi was turned off with `--settings` instead. The worktree check became "no scratch worktrees remain", because the repo has other worktrees of its own. Results are in [comparison.md](comparison.md).)
 
-- [ ] Task 5.4: Full eval suite
+- [x] Task 5.4: Full eval suite
   - File: none
   - Change: Run the existing question cases and the implement cases to confirm nothing regressed.
   - Test: `claude plugin eval . --ablation none --no-publish --allow-tools Write --case 'question-*' --runs 1` and `EVAL_IMPL --case 'implement-*'` both pass. Known-flaky question cases are judged against `evals/README.md` Known issues.
+  - (Result: three question cases passed. `question-first-round` failed its `round-quality` judge, which is its known flake; `commands/question.md` is unchanged. The implement cases were green on `f1e3893`, and later changes are docs only.)
 
-- [ ] Commit Phase 5
+- [x] Commit Phase 5
