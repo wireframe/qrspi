@@ -167,7 +167,7 @@ Shared commands used in Test lines:
 
 ## Phase 4: Seam reviews in subagents with pinned effort
 
-- [ ] Task 4.1: Red graders for seam dispatch
+- [x] Task 4.1: Red graders for seam dispatch
   - File: `evals/implement-dispatch/graders/gate-agent.md` (new); if Task 1.4's sidechain spike passed, also `graders/gate-effort.md` and `graders/final-effort.md` (new)
   - Change:
     - `gate-agent`: `tool_used`, `tool: Agent`, `input_match: '"subagent_type"\s*:\s*"qrspi:quality-gate"'`, `min: 2` (one phase gate plus the final pass).
@@ -176,14 +176,14 @@ Shared commands used in Test lines:
       - `final-effort`: same, but matching `high`.
   - Test: `EVAL_IMPL --case implement-dispatch` fails these on the Phase 3 `implement.md`, which is the red step.
 
-- [ ] Task 4.2: Quality-gate agent
+- [x] Task 4.2: Quality-gate agent
   - File: `agents/quality-gate.md` (new)
   - Change:
     - Frontmatter: `name: quality-gate`; a `description` ("Runs a qrspi seam review on a diff range and returns a summary"); `model: inherit`. This keeps it on the session model even when `CLAUDE_CODE_SUBAGENT_MODEL` is set (research: model precedence). Omit `tools`, because it needs Bash, Edit, Skill and Agent for `/code-review`'s fork.
     - Body: run exactly the review steps given in its prompt, in order. Re-run the given test command after any step that changes files. Don't commit. Return a summary of each step's fixes (what changed and why) and the final test result.
   - Test: `grep -c '^model: inherit$' agents/quality-gate.md` prints `1`
 
-- [ ] Task 4.3: Phase gate runs in the quality-gate agent
+- [x] Task 4.3: Phase gate runs in the quality-gate agent
   - File: `commands/implement.md:51-65`
   - Change: Rewrite the Quality Gate.
     - Step 1 (verify green) stays in the main thread.
@@ -192,22 +192,24 @@ Shared commands used in Test lines:
     - Add a note: the gate runs three subagent layers deep (gate → `/code-review` fork → reviewers). If dispatch fails at depth, run the same steps in the main thread and say so in the PR body's Summary.
   - Test: `grep -c '/code-review medium --fix' commands/implement.md` prints `1` and `grep -c 'qrspi:quality-gate' commands/implement.md` prints at least `1`
 
-- [ ] Task 4.4: Final pass runs in the quality-gate agent
+- [x] Task 4.4: Final pass runs in the quality-gate agent
   - File: `commands/implement.md:37`
   - Change: Step 6 dispatches `qrspi:quality-gate` over the whole implementation's diff range. Its steps are `/code-review high --fix` then `/qrspi:code-review` (fix what it flags). The main thread commits any fixes as `Final review fixes`, using the summary in the commit message.
   - Test: `grep -c '/code-review high --fix' commands/implement.md` prints `1`
 
-- [ ] Task 4.5: PR body draws on gate summaries
+- [x] Task 4.5: PR body draws on gate summaries
   - File: `commands/implement.md:45`, `commands/implement.md:69` (Open Pull Request intro)
   - Change: State that the Summary's notes on judgment calls and notable review fixes come from the quality-gate summaries the main thread received. It no longer sees the raw review output.
   - Test: `grep -c 'quality-gate summar' commands/implement.md` prints at least `1`
 
-- [ ] Task 4.6: Green run
+- [x] Task 4.6: Green run
   - File: none
   - Change: Run both cases.
   - Test: `EVAL_IMPL --case 'implement-*'` passes all graders
+  - (Changed at the Phase 4 gate: the phase gate and the final pass are now one Quality Gate procedure with a two-row input table. Each phase is committed as `Phase N: <name>` before its gate, so both gates review a committed range on a clean tree. Gate fixes land in a `Phase N quality gate` or `Final review fixes` commit. The main thread's own green check was dropped, because the gate's baseline run covers it. Re-dispatch limits, commit-body contents and the depth fallback are each stated once, and the gate agent applies only fixes inside its diff range. At `/code-review`: each skill now gets the row's range as an explicit target (a traced run showed the agent had been adding it on its own). The Final row uses the range, not the branch name. The phase commit takes only the staged tasks, the gate-fix commit uses `git add -u` plus new files the summary names, the main thread records `<phase start>`, and a gate fix is committed before the gate is re-dispatched.)
+  - (During execution: one escalation run stopped after two Sonnet `FAILED` replies, reasoning that the plan couldn't be satisfied. Step 3 now says repeated failures, or an implementer's conclusion that the plan can't be satisfied, aren't blockers before the Opus implementer's second `FAILED`. The next two runs were green.)
 
-- [ ] Commit Phase 4
+- [x] Commit Phase 4
 
 ## Phase 5: Docs, version, and comparison run
 
