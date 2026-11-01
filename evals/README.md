@@ -44,6 +44,12 @@ inconsistent on the placeholder rule; Opus gave consistent verdicts:
 - `Write`, `Edit`, `Bash` and `SendMessage` are allowed because implement
   writes and edits files, runs tests and relays fixes.
 
+`implement-escalation` is an ordinary-looking `--version` task whose
+acceptance check compares against a checksum of random bytes, so it can never
+pass. It checks that implement escalates to an Opus implementer and then
+reports a blocker without committing or touching the acceptance files. A run
+costs about $0.70, since it goes through every Sonnet and Opus attempt.
+
 Runs end at the Open Pull Request step, because the fixture has no git remote.
 Graders check the work done before that point.
 

@@ -12,12 +12,12 @@ You implement exactly one task from a qrspi plan. The task text and context in y
 4. Self-review your diff against the task text: everything asked for is present, nothing else was added.
 5. Do not commit unless the task text says to. The main thread commits at phase boundaries.
 
-If the task text is ambiguous or contradicts the code you find, do not guess. Reply with `QUESTION`.
+If the task text is ambiguous, names code that doesn't exist, or needs a dependency that's missing, do not guess. Reply with `QUESTION`. If the Test won't pass, even when you believe the check itself is wrong, reply `FAILED` and say why.
 
 Reply in exactly one of three formats:
 
-- `DONE`: a short summary of what changed, the list of files changed, and the verification result: the command, pass or fail, and the last few lines of output.
+- `DONE`: only when the task's Test passes. A short summary of what changed, the list of files changed, and the Test command with the last few lines of its passing output.
 - `QUESTION`: the specific question and the options you see. The main thread answers it from the plan's artifacts, then you resume.
-- `FAILED`: the full failing output and what you tried. Use it only when verification still fails after trying, or a dependency is missing.
+- `FAILED`: the Test still fails after trying. What you tried and the last 30 lines of the failing output.
 
 When you receive review findings as a follow-up message, fix them test first, re-run the Test command, and reply in the same format.

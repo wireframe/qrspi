@@ -129,7 +129,7 @@ Shared commands used in Test lines:
 
 ## Phase 3: Escalation before blocking
 
-- [ ] Task 3.1: Escalation fixture and red graders
+- [x] Task 3.1: Escalation fixture and red graders
   - File: `evals/implement-escalation/fixture.sh`, `case.yaml`, `prompt.md`, `graders/escalated-to-opus.md`, `graders/no-pr.md`, `graders/reports-blocker.md` (all new)
   - Change:
     - Fixture: same git setup as Task 1.1, but `plan.md` has one task: "Make `bash verify.sh` pass; do not modify verify.sh". `verify.sh` passes only if `answer.txt` equals `date +%s%N` at verification time, so it can never pass.
@@ -139,28 +139,31 @@ Shared commands used in Test lines:
       - `escalated-to-opus`: `tool_used`, `tool: Agent`, `input_match: '"model"\s*:\s*"opus"'`.
       - `no-pr`: `tool_used`, `tool: Bash`, `input_match: 'gh pr create'`, `min: 0`, `max: 0`.
       - `reports-blocker`: `type: llm`, focus `last_message`. PASS if the final message stops on the verification failure and asks the user for help.
+    - (Changed during execution: an Opus main thread read the impossible plan and `verify.sh` and declared a blocker without dispatching, then on a disguised version investigated and edited `tool.sh` itself. The fixture is now an ordinary `--version` task (`docs/plans/2026-01-01-version-flag`) whose `verify.sh` compares the output's SHA-256 against an `expected.sha256` generated from random bytes. Added `implementer-dispatched`: `tool_used`, `tool: Agent`, `input_match` on `qrspi:implementer`, `min: 1`.)
   - Test: `EVAL_IMPL --case implement-escalation` fails `escalated-to-opus` on the Phase 2 `implement.md`, which is the red step.
 
-- [ ] Task 3.2: Escalation rule in implement.md
+- [x] Task 3.2: Escalation rule in implement.md
   - File: `commands/implement.md` (Subagent-Driven Development, new step after the implementer dispatch)
   - Change: Add an escalation step to the main thread:
     - An implementer attempt fails when it returns `FAILED`, or its verification output doesn't pass.
     - After the first attempt plus two `SendMessage` fix attempts all fail, dispatch a fresh `qrspi:implementer` with `model: opus`.
     - Its prompt holds the task text plus each failed attempt's summary and failing output. A subagent keeps its model across follow-ups, so this must be a new dispatch (research: Constraints).
     - Reviews then proceed as normal against the Opus implementer.
+    - (Added during execution, from Task 3.1's finding:) The main thread never implements, edits code or debugs a verification failure itself, even when a task looks impossible. A baseline failure before dispatch is the expected red. Only implementer results and this escalation count decide a blocker.
+  - (Changed at the Phase 3 gate: `DONE` now means the Test passed and `FAILED` means it didn't, and a missing dependency comes back as `QUESTION`. The Sonnet implementer gets three `FAILED` replies and the Opus implementer gets two. Fix follow-ups don't resend output the implementer already has. The Opus prompt carries one line per failed attempt plus the latest failing output. The "never work a task yourself" rule moved to the top of the section, and it states that a failing Test becomes a blocker only through escalation, even when an implementer says the check can't pass. A `QUESTION` is for a task that's ambiguous, names code that doesn't exist, or needs a missing dependency. A Test that won't pass is always `FAILED`; routing "the check looks wrong" to `QUESTION` skipped escalation, which a traced eval run caught. The Quality Gate sends a failing suite back through escalation. The Opus prompt lists the files the earlier implementer changed. The acceptance graders match on file path only, and the escalation grader is renamed `implementer-agent`.)
   - Test: `grep -c 'model: opus' commands/implement.md` prints at least `1`
 
-- [ ] Task 3.3: Quantify blockers
+- [x] Task 3.3: Quantify blockers
   - File: `commands/implement.md:43`
   - Change: Replace "a task's verification still fails after repeated fix attempts" with "a task's verification still fails after the Opus escalation (see Subagent-Driven Development)".
   - Test: `grep -c 'repeated fix attempts' commands/implement.md` prints `0`
 
-- [ ] Task 3.4: Green run
+- [x] Task 3.4: Green run
   - File: none
   - Change: Run both cases.
   - Test: `EVAL_IMPL --case 'implement-*'` passes all graders in both cases
 
-- [ ] Commit Phase 3
+- [x] Commit Phase 3
 
 ## Phase 4: Seam reviews in subagents with pinned effort
 

@@ -27,20 +27,21 @@ Execute the implementation plan end to end without pausing for feedback. The pul
 
 ### Subagent-Driven Development
 
-Fresh subagent per task, with a two-stage review after each.
+Fresh subagent per task, with a two-stage review after each. Never implement, edit code, or debug a task yourself, even when it looks impossible: a task's test failing before any implementer runs is the expected TDD red, not a blocker, and a failing Test becomes a blocker only through step 3's escalation — even when an implementer reports the check itself can't pass.
 
 1. Read the plan once; extract every task's full text and context up front; track them (e.g. via TodoWrite).
-2. Per task: dispatch `qrspi:implementer` (Agent tool `subagent_type`), handing it the full task text and context directly — never just a file path. If it returns `QUESTION`, answer it yourself from the plan and its artifacts (`decisions.md`, `research.md`, `structure.md`) via `SendMessage` to that same implementer — don't relay it to the user unless it's a blocker. It implements, runs the task's verification, and self-reviews, then returns `DONE` with its files changed, or `FAILED` (see Blockers below).
-3. **Spec-compliance review, then quality review, in that order — never the reverse.** Dispatch a fresh `qrspi:spec-reviewer` with the task's full text and the implementer's latest file list (from its most recent `DONE`); it checks the change against the task's own text only. On `GAPS`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:spec-reviewer` — repeat until `COMPLIANT`.
-4. Once `COMPLIANT`, dispatch a fresh `qrspi:quality-reviewer` with the same inputs. On `request changes` or `block`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:quality-reviewer` — repeat until `approve`. Then stage the task's files (`git add -- <file list>`) so the next task's reviewers see only that task's changes in `git diff`. Per-task review does not run a correctness code-review pass; that happens at the Quality Gate and the final pass.
-5. Never move to the next task while either review still has open issues (a review that won't converge is a blocker — see Blockers below), and never dispatch multiple implementers in parallel (they'll conflict).
-6. After the last task in the plan, run one final `/code-review` and `/qrspi:code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
+2. Per task: dispatch `qrspi:implementer` (Agent tool `subagent_type`), handing it the full task text and context directly — never just a file path. If it returns `QUESTION`, answer it yourself from the plan and its artifacts (`decisions.md`, `research.md`, `structure.md`) via `SendMessage` to that same implementer — don't relay it to the user unless it's a blocker. It implements, runs the task's verification, and self-reviews, then returns `DONE` with its files changed, or `FAILED` (see step 3).
+3. **Escalate a failing implementer.** Each `FAILED` reply counts against that implementer, including replies to review-fix follow-ups, and so does a `DONE` whose Test output doesn't show a pass; `QUESTION` doesn't count. On its first or second `FAILED`, `SendMessage` "fix and re-run" (plus any open review findings) to the same implementer. After three `FAILED` replies, dispatch a fresh `qrspi:implementer` with `model: opus` — a subagent keeps its model across follow-ups, so this must be a new dispatch. Its prompt holds the task text, the files the earlier implementer changed, one line per failed attempt on what it tried, the latest failing output, and any open review findings; reviews then proceed against it. It gets two `FAILED` replies.
+4. **Spec-compliance review, then quality review, in that order — never the reverse.** Dispatch a fresh `qrspi:spec-reviewer` with the task's full text and the implementer's latest file list (from its most recent `DONE`); it checks the change against the task's own text only. On `GAPS`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:spec-reviewer` — repeat until `COMPLIANT`.
+5. Once `COMPLIANT`, dispatch a fresh `qrspi:quality-reviewer` with the same inputs. On `request changes` or `block`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:quality-reviewer` — repeat until `approve`. Then stage the task's files (`git add -- <file list>`) so the next task's reviewers see only that task's changes in `git diff`. Per-task review does not run a correctness code-review pass; that happens at the Quality Gate and the final pass.
+6. Never move to the next task while either review still has open issues (a review that won't converge is a blocker — see Blockers below), and never dispatch multiple implementers in parallel (they'll conflict).
+7. After the last task in the plan, run one final `/code-review` and `/qrspi:code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
 
 ### Blockers
 
 The only reason to stop before the PR is opened. Stop and ask the user when:
-- a task can't proceed (missing dependency, an instruction the plan and its artifacts can't resolve),
-- a task's verification still fails after repeated fix attempts, or
+- an implementer reports a task can't proceed: a `QUESTION` the plan and its artifacts can't answer, or a missing dependency,
+- the Opus implementer returns its second `FAILED` (see Subagent-Driven Development step 3), or
 - a spec or quality review still has open issues after three fix rounds.
 
 Ambiguity you can resolve from the plan's artifacts is not a blocker — resolve it, and note the call you made in the PR body's Summary.
@@ -53,7 +54,7 @@ If the user drops, defers, or trims a phase or task during execution, before con
 
 After the last task of each plan phase is implemented and its tests pass — and **before** that phase is considered done — run this gate on the phase's accumulated diff. It is non-negotiable.
 
-1. **Verify green.** Confirm the phase's tests pass first (the verification command from the phase's plan tasks). A failing suite is a blocker — stop and fix before gating.
+1. **Verify green.** Confirm the phase's tests pass first (the verification command from the phase's plan tasks). A failing suite goes back to the implementer of the failing task through Subagent-Driven Development step 3 — never fix it yourself.
 2. **`/simplify`.** Run it to apply reuse/simplification/efficiency/altitude cleanups (it always auto-applies). This goes first so the next step isn't re-flagging the same cleanups.
 3. **Re-run the test suite.** `/simplify` mutates the working tree — reconfirm green. If it broke something, fix or revert the offending cleanup before continuing.
 4. **`/code-review --fix`.** Run it to catch correctness bugs plus any remaining quality issues and apply the fixes automatically.
