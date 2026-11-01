@@ -30,17 +30,18 @@ Execute the implementation plan end to end without pausing for feedback. The pul
 Fresh subagent per task, with a two-stage review after each.
 
 1. Read the plan once; extract every task's full text and context up front; track them (e.g. via TodoWrite).
-2. Per task: dispatch a fresh implementer subagent, handing it the full task text and context directly — never just a file path. If it asks questions, answer them yourself from the plan and its artifacts (`decisions.md`, `research.md`, `structure.md`) — don't relay them to the user unless they're a blocker. It implements, runs the task's verification, and self-reviews.
-3. **Spec-compliance review, then code-quality review, in that order — never the reverse.** Dispatch an independent subagent to check the diff against the task's own text only: everything asked for is present, nothing extra was added. If it finds gaps, the same implementer subagent fixes them and it re-reviews — repeat until clean.
-4. Once spec-compliant, dispatch an independent subagent to run `/code-review` and `/qrspi:code-review` on the diff. If either finds issues, the same implementer subagent fixes them and it re-reviews — repeat until both approve.
-5. Never move to the next task while either review still has open issues, and never dispatch multiple implementer subagents in parallel (they'll conflict).
+2. Per task: dispatch `qrspi:implementer` (Agent tool `subagent_type`), handing it the full task text and context directly — never just a file path. If it returns `QUESTION`, answer it yourself from the plan and its artifacts (`decisions.md`, `research.md`, `structure.md`) via `SendMessage` to that same implementer — don't relay it to the user unless it's a blocker. It implements, runs the task's verification, and self-reviews, then returns `DONE` with its files changed, or `FAILED` (see Blockers below).
+3. **Spec-compliance review, then quality review, in that order — never the reverse.** Dispatch a fresh `qrspi:spec-reviewer` with the task's full text and the implementer's latest file list (from its most recent `DONE`); it checks the change against the task's own text only. On `GAPS`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:spec-reviewer` — repeat until `COMPLIANT`.
+4. Once `COMPLIANT`, dispatch a fresh `qrspi:quality-reviewer` with the same inputs. On `request changes` or `block`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:quality-reviewer` — repeat until `approve`. Then stage the task's files (`git add -- <file list>`) so the next task's reviewers see only that task's changes in `git diff`. Per-task review does not run a correctness code-review pass; that happens at the Quality Gate and the final pass.
+5. Never move to the next task while either review still has open issues (a review that won't converge is a blocker — see Blockers below), and never dispatch multiple implementers in parallel (they'll conflict).
 6. After the last task in the plan, run one final `/code-review` and `/qrspi:code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
 
 ### Blockers
 
 The only reason to stop before the PR is opened. Stop and ask the user when:
-- a task can't proceed (missing dependency, an instruction the plan and its artifacts can't resolve), or
-- a task's verification still fails after repeated fix attempts.
+- a task can't proceed (missing dependency, an instruction the plan and its artifacts can't resolve),
+- a task's verification still fails after repeated fix attempts, or
+- a spec or quality review still has open issues after three fix rounds.
 
 Ambiguity you can resolve from the plan's artifacts is not a blocker — resolve it, and note the call you made in the PR body's Summary.
 

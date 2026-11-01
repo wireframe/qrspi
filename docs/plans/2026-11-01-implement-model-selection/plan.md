@@ -45,7 +45,7 @@ Shared commands used in Test lines:
   - Change:
     - `tasks-ticked`: `type: regex`, `target: { source: file, path: docs/plans/2026-01-01-greeting/plan.md }`, `pattern: '- \[x\] Task 1\.1[\s\S]*- \[x\] Task 1\.2'` (both tasks; tightened at the Phase 1 gate).
     - `phase-committed`: `type: tool_used`, `tool: Bash`, `input_match: 'git commit'`.
-    - `dispatched-agents`: `type: tool_used`, `tool: Agent`, `min: 2`.
+    - `dispatched-agents`: `type: tool_used`, `tool: Agent`, `min: 2`. (Removed at the Phase 2 gate: the three role graders from Task 2.1 imply it.)
     - `greeting-works`: `type: regex`, `target: { source: file, path: greet.sh }`, `pattern: 'world'`. Grades the script itself, because `Hello, world` also appears in the fixture's plan text and would match the trace even if nothing ran (changed after review).
   - Test: `EVAL_IMPL --case implement-dispatch` passes all four graders on the current `commands/implement.md`. Expect it to end at the Open Pull Request step with "Can't resolve the GitHub repo", because the fixture has no remote.
 
@@ -72,7 +72,7 @@ Shared commands used in Test lines:
 
 ## Phase 2: Role agents dispatched from the main thread
 
-- [ ] Task 2.1: Red graders for role dispatch
+- [x] Task 2.1: Red graders for role dispatch
   - File: `evals/implement-dispatch/graders/implementer-agent.md`, `graders/spec-reviewer-agent.md`, `graders/quality-reviewer-agent.md` (new)
   - Change:
     - Each is `type: tool_used`, `tool: Agent`, with `input_match` set to:
@@ -82,7 +82,7 @@ Shared commands used in Test lines:
     - If Task 1.4 showed Agent inputs can't be matched, use `type: llm`, `focus: trace` graders that state the same criteria instead.
   - Test: `EVAL_IMPL --case implement-dispatch` fails these three graders on the unchanged `commands/implement.md`, which is the red step.
 
-- [ ] Task 2.2: Implementer agent
+- [x] Task 2.2: Implementer agent
   - File: `agents/implementer.md` (new)
   - Change:
     - Frontmatter: `name: implementer`; a `description` ("Implements one qrspi plan task with TDD and runs its verification"); `model: sonnet`. Omit `tools` so it inherits all of them.
@@ -94,21 +94,21 @@ Shared commands used in Test lines:
       - Ask questions instead of guessing when the task text is ambiguous.
   - Test: `grep -c '^model: sonnet$' agents/implementer.md` prints `1`
 
-- [ ] Task 2.3: Spec-compliance reviewer agent
+- [x] Task 2.3: Spec-compliance reviewer agent
   - File: `agents/spec-reviewer.md` (new)
   - Change:
     - Frontmatter: `name: spec-reviewer`; a `description` ("Checks a task's diff against the task text: everything asked for, nothing extra"); `model: haiku`; `tools: Read, Glob, Grep, Bash`. Bash is for `git diff` only; the body says not to modify files.
     - Body: given the task text and a diff range, return `COMPLIANT`, or `GAPS` followed by a list of missing items and unrequested additions, each with `file:line`.
   - Test: `grep -c '^model: haiku$' agents/spec-reviewer.md` prints `1` and `grep -c '^tools: Read, Glob, Grep, Bash$' agents/spec-reviewer.md` prints `1`
 
-- [ ] Task 2.4: Quality reviewer agent
+- [x] Task 2.4: Quality reviewer agent
   - File: `agents/quality-reviewer.md` (new)
   - Change:
     - Frontmatter: `name: quality-reviewer`; a `description` ("Runs the /qrspi:code-review checklist on one task's diff"); `model: sonnet`; `tools: Read, Glob, Grep, Bash, Skill`. `Skill` is required to run `/qrspi:code-review` (research: Constraints).
     - Body: run `/qrspi:code-review` on the given diff range, don't modify files, and return the skill's Review Response Format with an approve or request-changes summary line.
   - Test: `grep -c 'Skill' agents/quality-reviewer.md` prints at least `1` and `grep -c '^model: sonnet$' agents/quality-reviewer.md` prints `1`
 
-- [ ] Task 2.5: Rewrite per-task dispatch in implement.md
+- [x] Task 2.5: Rewrite per-task dispatch in implement.md
   - File: `commands/implement.md:28-36`
   - Change: Replace steps 2-5 of Subagent-Driven Development so the main thread does all of the following:
     - Dispatches `qrspi:implementer` with the full task text and context, and answers its questions from the artifacts (existing rule kept).
@@ -117,14 +117,15 @@ Shared commands used in Test lines:
     - Then dispatches `qrspi:quality-reviewer` the same way, with the same fix loop.
     - Per-task review no longer runs `/code-review`; correctness review happens at the Quality Gate and the final pass.
     - Keeps the "never in parallel" and "never move on with open issues" rules.
+    - (Changed in review: reviewers get the implementer's latest file list instead of a diff range, since nothing is committed per task; review loops are capped at three fix rounds, added as a Blockers bullet; each approved task is staged so a later task's `git diff` on a shared file shows only its own changes.)
   - Test: `grep -c 'qrspi:implementer\|qrspi:spec-reviewer\|qrspi:quality-reviewer' commands/implement.md` prints at least `3`, and `sed -n '/### Subagent-Driven/,/### Blockers/p' commands/implement.md | grep -c '`/code-review`'` prints `1` (only the final-pass line, step 6)
 
-- [ ] Task 2.6: Green run
+- [x] Task 2.6: Green run
   - File: none
   - Change: Run the dispatch case against the new agents and `implement.md`.
   - Test: `EVAL_IMPL --case implement-dispatch` passes every grader, including Task 2.1's three
 
-- [ ] Commit Phase 2
+- [x] Commit Phase 2
 
 ## Phase 3: Escalation before blocking
 
