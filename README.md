@@ -13,6 +13,16 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 /plugin install qrspi@qrspi
 ```
 
+### Pi
+
+QRSPI is also a [Pi](https://pi.dev) package. Install it for every project, or add `--local` to declare it in one project's `.pi/settings.json`:
+
+```
+pi install git:github.com/wireframe/qrspi
+```
+
+Pi loads the same `commands/` as prompt templates (`/question`, `/research`, `/structure`, `/plan`, `/implement`) and `skills/` as skills (`/skill:code-review`). `pi/index.mjs` tells Pi what the commands' Claude-only names mean there (`${CLAUDE_PLUGIN_ROOT}`, `/qrspi:<phase>`, `AskUserQuestion`, `/simplify`, `/code-review`). `/implement` dispatches subagents through the `subagent` tool when a package such as [`pi-subagents`](https://www.npmjs.com/package/pi-subagents) provides it, and does the work itself otherwise. Run the adapter's tests with `npm test`.
+
 ## Commands
 
 - **`/qrspi:question <topic>`** — Surface design decisions in rounds: each round asks every question whose prerequisites are settled, with a recommended answer. Writes `decisions.md`.
