@@ -20,27 +20,30 @@ Execute the implementation plan end to end without pausing for feedback. The pul
 
 ## Steps
 
-1. Print a summary of the plan: total phases, total tasks, estimated scope. Then proceed immediately.
+1. Print a summary of the plan: total phases, total tasks, estimated scope. Record the starting commit once (`git rev-parse HEAD`) as the base SHA. Then proceed immediately.
 2. Execute the plan with subagent-driven development (below). **Run the Quality Gate (below) at every phase boundary.**
 3. As tasks complete, update the checkboxes in `$ARGUMENTS/plan.md` from `- [ ]` to `- [x]`.
-4. Once every phase has passed its Quality Gate, run Open Pull Request (below).
+4. Once every phase has passed its Quality Gate and the final pass has passed (Quality Gate, Final row), run Open Pull Request (below).
 
 ### Subagent-Driven Development
 
-Fresh subagent per task, with a two-stage review after each.
+Fresh subagent per task, with a two-stage review after each. Never implement, edit code, or debug a task yourself, even when it looks impossible: a task's test failing before any implementer runs is the expected TDD red, not a blocker, and a failing Test becomes a blocker only through step 3's escalation — even when an implementer reports the check itself can't pass.
 
 1. Read the plan once; extract every task's full text and context up front; track them (e.g. via TodoWrite).
-2. Per task: dispatch a fresh implementer subagent, handing it the full task text and context directly — never just a file path. If it asks questions, answer them yourself from the plan and its artifacts (`decisions.md`, `research.md`, `structure.md`) — don't relay them to the user unless they're a blocker. It implements, runs the task's verification, and self-reviews.
-3. **Spec-compliance review, then code-quality review, in that order — never the reverse.** Dispatch an independent subagent to check the diff against the task's own text only: everything asked for is present, nothing extra was added. If it finds gaps, the same implementer subagent fixes them and it re-reviews — repeat until clean.
-4. Once spec-compliant, dispatch an independent subagent to run `/code-review` and `/qrspi:code-review` on the diff. If either finds issues, the same implementer subagent fixes them and it re-reviews — repeat until both approve.
-5. Never move to the next task while either review still has open issues, and never dispatch multiple implementer subagents in parallel (they'll conflict).
-6. After the last task in the plan, run one final `/code-review` and `/qrspi:code-review` pass over the entire implementation's diff, independent of the per-phase Quality Gate below.
+2. Per task: dispatch `qrspi:implementer` (Agent tool `subagent_type`), handing it the full task text and context directly — never just a file path. If it returns `QUESTION`, answer it yourself from the plan and its artifacts (`decisions.md`, `research.md`, `structure.md`) via `SendMessage` to that same implementer — don't relay it to the user unless it's a blocker. It implements, runs the task's verification, and self-reviews, then returns `DONE` with its files changed, or `FAILED` (see step 3).
+3. **Escalate a failing implementer.** Each `FAILED` reply counts against that implementer, including replies to review-fix follow-ups, and so does a `DONE` whose Test output doesn't show a pass; `QUESTION` doesn't count. On its first or second `FAILED`, `SendMessage` "fix and re-run" (plus any open review findings) to the same implementer. After three `FAILED` replies, dispatch a fresh `qrspi:implementer` with `model: opus` — a subagent keeps its model across follow-ups, so this must be a new dispatch. Its prompt holds the task text, the files the earlier implementer changed, one line per failed attempt on what it tried, the latest failing output, and any open review findings; reviews then proceed against it. It gets two `FAILED` replies: on its first, `SendMessage` "fix and re-run" to it. Don't stop early: repeated or identical failures, or an implementer concluding the plan can't be satisfied, are not blockers until the Opus implementer's second `FAILED`.
+4. **Spec-compliance review, then quality review, in that order — never the reverse.** Dispatch a fresh `qrspi:spec-reviewer` with the task's full text and the implementer's latest file list (from its most recent `DONE`); it checks the change against the task's own text only. On `GAPS`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:spec-reviewer` — repeat until `COMPLIANT`.
+5. Once `COMPLIANT`, dispatch a fresh `qrspi:quality-reviewer` with the same inputs. On `request changes` or `block`, `SendMessage` the findings to the same implementer, then dispatch a fresh `qrspi:quality-reviewer` — repeat until `approve`. Then stage the task's files (`git add -- <file list>`) so the next task's reviewers see only that task's changes in `git diff`. Per-task review does not run a correctness code-review pass; that happens at the Quality Gate and the final pass.
+6. Never move to the next task while either review still has open issues (a review that won't converge is a blocker — see Blockers below), and never dispatch multiple implementers in parallel (they'll conflict).
+7. After the last phase's Quality Gate, run the final pass: the Quality Gate below with its Final row.
 
 ### Blockers
 
 The only reason to stop before the PR is opened. Stop and ask the user when:
-- a task can't proceed (missing dependency, an instruction the plan and its artifacts can't resolve), or
-- a task's verification still fails after repeated fix attempts.
+- an implementer reports a task can't proceed: a `QUESTION` the plan and its artifacts can't answer, or a missing dependency,
+- the Opus implementer returns its second `FAILED` (see Subagent-Driven Development step 3),
+- a spec or quality review still has open issues after three fix rounds, or
+- a Quality Gate (phase or final) still fails after Quality Gate step 3's re-dispatches.
 
 Ambiguity you can resolve from the plan's artifacts is not a blocker — resolve it, and note the call you made in the PR body's Summary.
 
@@ -48,25 +51,29 @@ Ambiguity you can resolve from the plan's artifacts is not a blocker — resolve
 
 If the user drops, defers, or trims a phase or task during execution, before continuing check `decisions.md` for which decisions that work served. If it carried a `Firm` decision, state how dropping it changes that decision (e.g. "dropping the approval phase turns Firm decision D1 'confirm before create' into 'refuse'") and confirm that's intended — do NOT let a Firm decision silently degrade into its opposite.
 
-## Quality Gate (per phase)
+## Quality Gate
 
-After the last task of each plan phase is implemented and its tests pass — and **before** that phase is considered done — run this gate on the phase's accumulated diff. It is non-negotiable.
+One gate, run after each phase and once more after the last phase as the final pass. It is non-negotiable. Only the inputs differ:
 
-1. **Verify green.** Confirm the phase's tests pass first (the verification command from the phase's plan tasks). A failing suite is a blocker — stop and fix before gating.
-2. **`/simplify`.** Run it to apply reuse/simplification/efficiency/altitude cleanups (it always auto-applies). This goes first so the next step isn't re-flagging the same cleanups.
-3. **Re-run the test suite.** `/simplify` mutates the working tree — reconfirm green. If it broke something, fix or revert the offending cleanup before continuing.
-4. **`/code-review --fix`.** Run it to catch correctness bugs plus any remaining quality issues and apply the fixes automatically.
-5. **`/qrspi:code-review`.** Run it against the phase's Clean Code / TDD / pragmatic-programming standards; fix anything it flags.
-6. **Re-run the test suite.** `/code-review --fix` and `/qrspi:code-review` fixes also mutate the tree — reconfirm green. If a fix broke a test, resolve it before committing.
-7. **Commit the phase**, including the gate's changes (fold into the phase commit, or add a follow-up `Phase N quality gate` commit if the phase was already committed task-by-task).
+| Gate | Diff range | Test command | Review steps, in order | Fix commit title |
+|---|---|---|---|---|
+| Phase | `<phase start>..HEAD` | the phase's verification commands, joined with `&&` | `/simplify <range>`, `/code-review medium --fix <range>`, `/qrspi:code-review <range>` | `Phase N quality gate` |
+| Final | `<base SHA>..HEAD` | every phase's verification commands, joined with `&&` | `/code-review high --fix <range>`, `/qrspi:code-review <range>` | `Final review fixes` |
+
+Record `<phase start>` (`git rev-parse HEAD`) before each phase's first task; `<range>` is the row's diff range, passed to each skill as its target.
+
+1. **Commit first.** For a phase gate, stage the plans folder (`git add -- $ARGUMENTS`, which carries the ticked checkboxes and any not-yet-committed artifacts the PR links to), then commit it with the phase's staged tasks as `Phase N: <name>` (tasks are staged in Subagent-Driven Development step 5; don't `git add -A`, so stray untracked files stay out), so the gate reviews a committed range on a clean tree.
+2. **Dispatch `qrspi:quality-gate`** (Agent tool `subagent_type`) with the row's diff range, test command and review steps.
+3. **Act on its reply.** `PASSED`: go to step 4. `FAILED`: pick the task from the files or tests in the failing output and dispatch a fresh `qrspi:implementer` with that task's text, the failing output and the files changed; it gets a fresh budget and the same escalation as Subagent-Driven Development step 3 — never fix it yourself. If no task can be identified, it's a blocker. Then commit the fix and the gate's passing edits as in step 4, adding the files the implementer's `DONE` lists, so the re-dispatched gate starts on a clean tree, and re-dispatch the gate. `FAILED: missing input`: re-dispatch with all three inputs. Re-dispatch at most twice after `FAILED` and once after `FAILED: missing input`; after that it's a blocker.
+4. **Commit the gate's fixes.** If the gate changed files, stage the tracked changes (`git add -u`) plus the new files its summary lists, and commit with the row's title. The body takes the gate's applied, skipped and reverted lines and its flagged large or surprising fixes, not raw test output — don't pause for confirmation.
 
 Notes:
-- This gate runs at the **phase seam**, not per task. It does not replace the per-task spec/quality reviewers — it adds a whole-phase pass (`/simplify`'s altitude view + `/code-review`'s correctness sweep + `/qrspi:code-review`'s standards checklist) over the combined diff.
-- If either step's fixes are large or surprising, describe them in the commit message so PR reviewers see them — don't pause for confirmation.
+- The phase gate adds a whole-phase pass over the per-task reviews; the final pass adds a cross-phase correctness sweep at `high` effort.
+- The gate runs three subagent layers deep (gate → `/code-review` fork → its reviewers), exactly the default `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` limit of 3. If the dispatch fails at depth, follow `agents/quality-gate.md`'s steps in the main thread, applying the review skills' edits and fixing what `/qrspi:code-review` flags; red tests still go to an implementer as in step 3. Say so in the PR body's Summary.
 
 ## Open Pull Request
 
-Runs once every phase's Quality Gate has passed and the final whole-diff `/code-review` pass has completed. Draft the pull request body from this plan's artifacts and open the PR. Do this automatically — do not ask for permission to draft or open it.
+Runs once every phase's Quality Gate has passed and the final whole-diff review pass has completed. Draft the pull request body from this plan's artifacts and open the PR. Do this automatically — do not ask for permission to draft or open it. For review fixes and the gate's judgment calls, draw on the quality-gate summaries rather than raw review output, alongside any calls you made yourself.
 
 1. **Resolve link targets.**
    - Resolve the repo slug: `gh repo view --json owner,name`. If this fails (not authenticated, or no `gh` remote configured), stop and tell the user: "Can't resolve the GitHub repo — run `gh auth login` or check the remote, then retry." (Include the command's actual error output when reporting this.) Do not fall back to relative links.
