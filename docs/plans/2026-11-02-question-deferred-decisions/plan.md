@@ -116,7 +116,7 @@ Eval command used below:
 
 ## Phase 3: /structure leaves file choices to /plan
 
-- [ ] Task 3.1: Red. New scaffolded case: structure lists no files
+- [x] Task 3.1: Red. New scaffolded case: structure lists no files
   - File: `evals/structure-no-files/case.yaml`, `evals/structure-no-files/fixture.sh`, `evals/structure-no-files/prompt.md`, `evals/structure-no-files/graders/wrote-structure.md`, `evals/structure-no-files/graders/no-files-field.md` (all new)
   - Change:
     - `fixture.sh`: copy `evals/implement-dispatch/fixture.sh` through its `research.md` heredoc (`:1-60`). Stop before structure.md.
@@ -125,19 +125,19 @@ Eval command used below:
     - `no-files-field.md`: `tool_used` Write with `input_match: 'structure\.md.*Files touched'`, `min: 0` and `max: 0`. This follows the pattern of `evals/implement-escalation/graders/acceptance-not-written.md`.
   - Test: `EVAL_SCAFFOLD --case structure-no-files` fails on `no-files-field` against the current `commands/structure.md`.
 
-- [ ] Task 3.2: Green. Remove the files field from the structure template
+- [x] Task 3.2: Green. Remove the files field from the structure template
   - File: `commands/structure.md:41`, `commands/structure.md:47`, `commands/structure.md:17`
   - Change:
     - Delete both `**Files touched:** <list of files>` lines.
     - At `:17`, add to Your Role: "Don't name files; exact file paths are /plan's job."
   - Test: `EVAL_SCAFFOLD --case structure-no-files` passes, and `grep -n 'Files touched' commands/structure.md` returns nothing.
 
-- [ ] Task 3.3: Keep the implement fixtures consistent with the new structure format
+- [x] Task 3.3: Keep the implement fixtures consistent with the new structure format
   - File: `evals/implement-dispatch/fixture.sh:68`, `evals/implement-escalation/fixture.sh:76`
   - Change: Delete the `**Files touched:**` line from each fixture's structure.md heredoc.
   - Test: `grep -rn 'Files touched' evals commands` returns nothing, and `bash -n` passes on both fixture files.
 
-- [ ] Commit Phase 3
+- [x] Commit Phase 3
 
 ## Phase 4: Old vs new delegation replay
 Serves Preference decisions D6 and D10, so it's kept minimal.
