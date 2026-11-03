@@ -9,8 +9,9 @@ import sys
 
 FIRMNESS_LEVELS = ("Firm", "Preference", "Open")
 QUESTION_START = re.compile(r"<command-name>/?qrspi:question</command-name>")
-BASH_DECISIONS_WRITE = re.compile(r">\s*\S*decisions\.md\b")
-MARKDOWN_QUESTION = re.compile(r"^❓ \*\*Q\d+\*\*", re.M)
+DECISIONS_FILE = re.compile(r"(?:^|/)decisions\.md(?![\w.-])")
+BASH_DECISIONS_WRITE = re.compile(r">\s*(?:\S*/)?decisions\.md(?![\w.-])")
+MARKDOWN_QUESTION = re.compile(r"^[ \t]*❓ \*\*Q\d+\*\*", re.M)
 
 
 def load_records(path):
@@ -25,13 +26,21 @@ def content_items(record):
     return content or []
 
 
+def items_in(records):
+    for record in records:
+        yield from content_items(record)
+
+
+def is_tool_call(item, name):
+    return item.get("type") == "tool_use" and item.get("name") == name
+
+
 def is_command_tag(item):
     return item.get("type") == "text" and bool(QUESTION_START.search(item.get("text", "")))
 
 
 def is_skill_call(item):
-    return item.get("type") == "tool_use" and item.get("name") == "Skill" \
-        and "qrspi:question" in json.dumps(item.get("input"))
+    return is_tool_call(item, "Skill") and item["input"]["skill"] == "qrspi:question"
 
 
 def is_question_start(record):
@@ -41,24 +50,21 @@ def is_question_start(record):
 
 def decisions_content(item):
     """Return the decisions.md text this tool call writes, or None if it writes none."""
-    if item.get("type") != "tool_use":
-        return None
-    arguments = item.get("input") or {}
-    if item.get("name") == "Write" and str(arguments.get("file_path", "")).endswith("decisions.md"):
-        return arguments.get("content", "")
-    if item.get("name") == "Bash" and BASH_DECISIONS_WRITE.search(arguments.get("command", "")):
-        return arguments["command"]
+    if is_tool_call(item, "Write") and DECISIONS_FILE.search(item["input"]["file_path"]):
+        return item["input"]["content"]
+    if is_tool_call(item, "Bash") and BASH_DECISIONS_WRITE.search(item["input"]["command"]):
+        return item["input"]["command"]
     return None
 
 
 def find_decisions_write(records):
-    """Return (index, content) of the first decisions.md write, or None if never written."""
+    """Return (index, content) of the first decisions.md write, or (len(records), "") if never written."""
     for index, record in enumerate(records):
         for item in content_items(record):
             content = decisions_content(item)
             if content is not None:
                 return index, content
-    return None
+    return len(records), ""
 
 
 def last_question_start(records):
@@ -69,15 +75,14 @@ def last_question_start(records):
 
 
 def count_picker_questions(records):
-    return sum(len(item["input"].get("questions", []))
-               for record in records for item in content_items(record)
-               if item.get("type") == "tool_use" and item.get("name") == "AskUserQuestion")
+    return sum(len(item["input"]["questions"])
+               for item in items_in(records) if is_tool_call(item, "AskUserQuestion"))
 
 
 def count_markdown_questions(records):
-    return sum(len(MARKDOWN_QUESTION.findall(item.get("text", "")))
-               for record in records if record.get("type") == "assistant"
-               for item in content_items(record) if item.get("type") == "text")
+    assistant_records = (record for record in records if record.get("type") == "assistant")
+    return sum(len(MARKDOWN_QUESTION.findall(item["text"]))
+               for item in items_in(assistant_records) if item.get("type") == "text")
 
 
 def deferred_count(decisions):
@@ -95,8 +100,7 @@ def decisions_stats(decisions):
 
 
 def question_stats(records):
-    decisions_write = find_decisions_write(records)
-    end, decisions = decisions_write if decisions_write else (len(records), "")
+    end, decisions = find_decisions_write(records)
     window = records[last_question_start(records[:end]) + 1:end]
     return {
         "picker_questions": count_picker_questions(window),
