@@ -10,17 +10,6 @@ cat > greet.sh <<'SH'
 echo "Hello, ${1}"
 SH
 
-cat > test.sh <<'SH'
-#!/usr/bin/env bash
-set -u
-actual=$(bash greet.sh Ann)
-if [ "$actual" != "Hello, Ann" ]; then
-  echo "FAIL: expected 'Hello, Ann', got '$actual'"
-  exit 1
-fi
-echo "PASS"
-SH
-
 plan_dir=docs/plans/2026-01-01-greeting
 mkdir -p "$plan_dir"
 

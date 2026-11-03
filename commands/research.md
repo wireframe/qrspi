@@ -23,7 +23,7 @@ Map the relevant codebase based on the "Research Focus Areas" from the decisions
 - Capture findings with `file:line` references.
 - Compress findings — distill truth, don't dump raw file contents.
 - **Own the Open decisions.** For every decision marked `Firmness: Open` in decisions.md, gather the codebase evidence needed to resolve it and lay out the viable options with grounded tradeoffs. Do NOT silently pick one, and do NOT let it pass through unaddressed — an unowned Open decision is what later gets resolved arbitrarily. Surface each in the "Open Decisions" output section below so the user (not `/structure`) resolves it deliberately.
-- **Own the Deferred decisions.** For every bullet under decisions.md's `## Deferred`, gather the codebase evidence and lay out the viable options with grounded tradeoffs, as for Open. Do NOT pick one — no recommended option, no "(a) is the best fit" lean, in the file or in the reply; if an existing D-entry bears on a bullet, state that as a fact and still leave the choice open. Do NOT let any bullet pass through unaddressed — every bullet gets its own entry. Surface each under "Deferred Decisions", separate from "Open Decisions", since these were never put to the user.
+- **Own the Deferred decisions.** For every bullet under decisions.md's `## Deferred`, gather the evidence and lay out the viable options with grounded tradeoffs, as for Open. Every bullet gets its own entry under "Deferred Decisions" (not "Open Decisions"), since these were never put to the user. Recommend nothing — no "(a) is the best fit" lean, in the file or in the reply; if an existing D-entry bears on a bullet, state that as a fact and still leave the choice open.
 
 ## Output
 
@@ -61,9 +61,7 @@ Decisions: [decisions.md](decisions.md)
 
 Research findings are usually too long to dump inline. Print an outline instead: each focus area title with its finding count (e.g. `Rate limiting middleware — 4 findings`), plus whether Patterns Observed / Constraints Discovered sections have entries — not the finding bodies. Tell the user the file path (`$ARGUMENTS/research.md`) to read the full detail.
 
-If there are Open Decisions, print those in full (title, options, tradeoffs) regardless of the outline-only rule above — the user needs that detail to resolve them — and tell the user which ones still need a call before `/qrspi:structure`, offering to record their answers back into `decisions.md` (flipping those entries from `Open` to `Firm`/`Preference`) before running the Continue Gate.
-
-If there are Deferred Decisions, print those in full too, and offer to record the user's picks back into `decisions.md` as new `## D<next>` entries (Firmness: Preference, with `**Depends on:**`), marking each resolved bullet in `## Deferred` (e.g. "→ resolved as D<n>").
+If there are Open or Deferred Decisions, print those in full (title, options, tradeoffs) regardless of the outline-only rule above — the user needs that detail to resolve them — and tell the user which ones still need a call before `/qrspi:structure`, offering to record their answers back into `decisions.md` before running the Continue Gate: flip an Open entry to `Firm`/`Preference`; record a Deferred pick as a new `## D<next>` entry after the last D-entry (Firmness: Preference, with `**Depends on:**`) and mark its bullet in `## Deferred` (e.g. "→ resolved as D<n>").
 
 Run the Continue Gate below.
 
@@ -74,4 +72,4 @@ Ask with the `AskUserQuestion` tool (fall back to a plain-text yes/no/revise pro
 - **"Continue to `/qrspi:structure`"** (recommended, default) — no changes needed. If unresolved Open or Deferred Decisions remain, note them as a caveat in this option's text. Immediately continue in this same turn: read `${CLAUDE_PLUGIN_ROOT}/commands/structure.md` and follow its instructions, passing through this phase's own `$ARGUMENTS` (the plans folder path) as its argument. Do not end the turn, and do not wait for the user to type the command themselves.
 - **"Stop here for now"** — acknowledge and end the turn.
 
-If the user selects **Other** (or, in the plain-text fallback, answers with anything besides a clear continue/stop), treat the typed text as the revision — unless it's blank or whitespace-only, in which case re-run this gate unchanged. Otherwise, apply it as an edit to `research.md` in place (do not ask before saving), re-print the updated outline, then run this gate again.
+If the user selects **Other** (or, in the plain-text fallback, answers with anything besides a clear continue/stop), treat the typed text as the revision — unless it's blank or whitespace-only, in which case re-run this gate unchanged. Otherwise, apply it as an edit to `research.md` in place (do not ask before saving; a pick for an Open or Deferred Decision is also recorded in `decisions.md` as described above), re-print the updated outline, then run this gate again.
