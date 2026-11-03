@@ -91,7 +91,7 @@ Assigning firmness:
 - A drive-by suggestion ("while you're at it, also add X"), a batch answer ("all of them"), a shrug ("sure, whatever's normal"), or an answer that is itself a question ("do we even need that?") is **Preference** or **Open** — never Firm. Do NOT manufacture a rationale for it, and do NOT escalate it into a broader mandate.
 - If firmness is genuinely unclear and it matters downstream, ask ONE quick follow-up: "Is X a hard requirement, or a lean you're open to changing?"
 - Anything you decided yourself because the user didn't weigh in is **Preference** at most — record it as your default, not their requirement.
-- **Delegation settles the rest.** If the user hands the remaining decisions to you ("go with your recommendations", "wrap it up"), settle each remaining decision that passes the ask test with your recommendation as **Preference**, or **Open** if it genuinely needs research, until the frontier is empty. Remaining decisions that fail the ask test go under Deferred, not recorded as decisions. Don't ask firmness follow-ups for delegated decisions.
+- **Delegation settles the rest.** If the user hands the remaining decisions to you ("go with your recommendations", "wrap it up"), settle each remaining decision that passes the ask test with your recommendation as **Preference**, or **Open** if it genuinely needs research, until the frontier is empty. Remaining decisions that fail the ask test go under Deferred, not recorded as decisions; delegation never adds decisions you wouldn't have asked. Don't ask firmness follow-ups for delegated decisions.
 - Every **Open** decision MUST also appear under "Research Focus Areas" — research owns resolving it.
 
 ## Output
