@@ -176,19 +176,19 @@ Serves Preference decisions D6 and D10, so it's kept minimal.
 
 ## Phase 5: Docs and release
 
-- [ ] Task 5.1: Point the frontier-rounds design doc at this change
+- [x] Task 5.1: Point the frontier-rounds design doc at this change
   - File: `docs/plans/2026-09-25-question-frontier-rounds-design.md:38`, `docs/plans/2026-09-25-question-frontier-rounds-design.md:79`
   - Change: Add a one-line note under the Interview loop and Stop-rule headings: "Narrowed by [2026-11-02 question-deferred-decisions](2026-11-02-question-deferred-decisions/decisions.md): only user-owned decisions are asked; the rest are Deferred."
   - Test: `grep -n '2026-11-02' docs/plans/2026-09-25-question-frontier-rounds-design.md` shows 2 hits.
 
-- [ ] Task 5.2: Update evals/README
+- [x] Task 5.2: Update evals/README
   - File: `evals/README.md:34-67`
   - Change:
     - Add a "Phase cases" section covering `question-asks-only-yours`, `research-deferred` and `structure-no-files`, with the `EVAL_SCAFFOLD` command for the two scaffolded ones.
     - Update Known issues with the Task 1.7 first-round result, and with the `Depends on` relaxation if Task 1.6 needed it.
   - Test: `grep -n 'research-deferred\|structure-no-files\|question-asks-only-yours' evals/README.md` shows every case.
 
-- [ ] Task 5.3: Bump the version to 0.7.0
+- [x] Task 5.3: Bump the version to 0.7.0
   - File: `.claude-plugin/plugin.json:3`
   - Change: `"version": "0.6.0"` → `"version": "0.7.0"`.
   - Test: `grep -n '"version": "0.7.0"' .claude-plugin/plugin.json`.

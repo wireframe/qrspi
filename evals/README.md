@@ -53,15 +53,35 @@ costs about $0.70, since it goes through every Sonnet and Opus attempt.
 Runs end at the Open Pull Request step, because the fixture has no git remote.
 Graders check the work done before that point.
 
+## Phase cases
+
+`question-asks-only-yours` checks that `/qrspi:question`'s first round asks only
+questions that are the user's to make and that change what research reads (LLM
+judge):
+
+    claude plugin eval . --ablation none --no-publish --allow-tools Write --runs 3 --case question-asks-only-yours
+
+`research-deferred` and `structure-no-files` are scaffolded cases (`fixture.sh`).
+The first checks that `/qrspi:research` lays out options for every Deferred
+bullet without recommending one. The second checks that `/qrspi:structure`
+writes phases without a files field. `--case` takes one glob, so run them
+separately. Each run costs about $0.20 and takes under a minute:
+
+    claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'research-*'
+    claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'structure-*'
+
 ## Known issues
 
-- `question-first-round` is flaky: 1 of 3 runs passed at `--threshold 1` on
-  2026-09-27. The judge fails rounds that ask a primary-goal question next to
-  questions it shapes. For this topic the true first frontier is often the goal
-  question alone, which conflicts with the `multiple-questions` grader. A topic
-  whose first decisions really are independent would fix the test.
-- `question-examples-unneeded` passed 1 of 3 runs on 2026-10-02 with the Opus
-  judge. Failing runs add include/exclude restatements to the repo-scope
-  question ("includes active service repos and skips archived ones") even
-  though the description already states the rule. `question-examples-helpful`
-  passed 3 of 3.
+- `question-first-round` is flaky: 2 of 3 runs passed on 2026-11-02 after the
+  ask-test change (1 of 3 at `--threshold 1` on 2026-09-27). The judge fails
+  rounds that ask a primary-goal question next to questions it shapes. For this
+  topic the true first frontier is often the goal question alone, which
+  conflicts with the `multiple-questions` grader. A topic whose first decisions
+  really are independent would fix the test.
+- `question-asks-only-yours` has a flaky LLM judge: it passes about 2 of 3 runs
+  at `--runs 3` with the default judge.
+- `question-examples-unneeded` passed 1 of 3 runs on 2026-10-02 and 3 of 4 on
+  2026-11-02 with the Opus judge. Failing runs add include/exclude
+  restatements to the repo-scope question ("includes active service repos and
+  skips archived ones") even though the description already states the rule.
+  `question-examples-helpful` passed 3 of 3.
