@@ -61,10 +61,15 @@ judge):
 
     claude plugin eval . --ablation none --no-publish --allow-tools Write --runs 3 --case question-asks-only-yours
 
-`research-deferred` and `structure-no-files` are scaffolded cases (`fixture.sh`).
-The first checks that `/qrspi:research` lays out options for every Deferred
-bullet without recommending one. The second checks that `/qrspi:structure`
-writes phases without a files field. `--case` takes one glob, so run them
+`research-deferred`, `structure-no-files` and `structure-vertical-slices` are
+scaffolded cases (`fixture.sh`). The first checks that `/qrspi:research` lays
+out options for every Deferred bullet without recommending one. The second
+checks that `/qrspi:structure` writes phases without a files field. The third
+gives `/qrspi:structure` a layered notes CLI whose plan includes a data
+migration and a release, and checks that every phase is a vertical slice with
+its docs inside it, with no storage-only first phase and no trailing release
+phase (LLM judge; 0 of 3 before the vertical-slice guidance, 3 of 3 after, on
+2026-11-03). `--case` takes one glob, so run research and structure
 separately. The scaffold flags are explained under Implement cases. Each run
 costs about $0.20 and takes under a minute:
 
