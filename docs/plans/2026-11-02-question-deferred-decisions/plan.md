@@ -142,7 +142,7 @@ Eval command used below:
 ## Phase 4: Old vs new delegation replay
 Serves Preference decisions D6 and D10, so it's kept minimal.
 
-- [ ] Task 4.1: Red. Tests for a question-stats tool
+- [x] Task 4.1: Red. Tests for a question-stats tool
   - File: `bin/test_question_stats.py` (new)
   - Change: Write `unittest` tests that build a temporary JSONL transcript and assert what `bin/question-stats` prints as JSON. The transcript has:
     - a user message with `<command-name>/qrspi:question</command-name>`;
@@ -153,12 +153,12 @@ Serves Preference decisions D6 and D10, so it's kept minimal.
     The expected output is `{"picker_questions": 2, "markdown_questions": 2, "decisions": 2, "deferred": 3, "firmness": {"Firm": 0, "Preference": 1, "Open": 1}}`. Add a second test where no decisions.md is written: decisions and deferred are 0.
   - Test: `python3 -m unittest bin/test_question_stats.py` fails, because the module doesn't exist.
 
-- [ ] Task 4.2: Green. Implement bin/question-stats
+- [x] Task 4.2: Green. Implement bin/question-stats
   - File: `bin/question-stats` (new, executable, `#!/usr/bin/env python3`, stdlib only)
   - Change: Port the counting logic from the usage-analysis extractor (scratchpad `extract.py`). It reads one transcript path and counts only up to the first decisions.md Write. It prints the JSON above. Keep functions small: `load_records`, `count_picker_questions`, `count_markdown_questions`, `decisions_stats`.
   - Test: `python3 -m unittest bin/test_question_stats.py` passes. Then `bin/question-stats ~/.claude/projects/-Users-ryansonnek--herdr-worktrees-tao-gpa-evals/07adc860-b262-4a19-be53-30af55185026.jsonl` reports `picker_questions` 12 and `decisions` 14.
 
-- [ ] Task 4.3: Run the delegation replay and record it
+- [x] Task 4.3: Run the delegation replay and record it
   - File: `docs/plans/2026-11-02-question-deferred-decisions/comparison.md` (new)
   - Change:
     - **Topics.** Take the original topic text from `bin/question-stats`-located transcripts for gpa-evals, agent-calendar, question-burster and scheduled-tasks: the first `/qrspi:question` `<command-args>` in each of `07adc860…`, `3188bb10…`, `c5f277fa…` and `2086fd9c…`.
@@ -172,7 +172,7 @@ Serves Preference decisions D6 and D10, so it's kept minimal.
     - **Write-up.** Write a table (topic × arm: round-1 questions, D-entries, Deferred, cost from `total_cost_usd`), the method, and a note that it's one run per cell, so the results are indicative.
   - Test: comparison.md has 8 rows with numbers that match the `bin/question-stats` outputs. Delete the old-arm worktree afterwards.
 
-- [ ] Commit Phase 4
+- [x] Commit Phase 4
 
 ## Phase 5: Docs and release
 
