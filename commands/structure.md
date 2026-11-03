@@ -14,7 +14,7 @@ Before doing anything else:
 
 ## Your Role
 
-Break the work into 3-5 independently testable, revertable phases. This is "how we get there" — a high-level roadmap, NOT the detailed task list. Don't name files; exact file paths are /plan's job.
+Break the work into 3-5 independently testable, revertable phases. This is "how we get there" — a high-level roadmap, NOT the detailed task list. Don't list the files each phase touches; exact file paths are /plan's job.
 
 ## Rules
 
