@@ -10,7 +10,7 @@ import sys
 FIRMNESS_LEVELS = ("Firm", "Preference", "Open")
 QUESTION_START = re.compile(r"<command-name>/?qrspi:question</command-name>")
 DECISIONS_FILE = re.compile(r"(?:^|/)decisions\.md(?![\w.-])")
-BASH_DECISIONS_WRITE = re.compile(r">\s*(?:\S*/)?decisions\.md(?![\w.-])")
+BASH_DECISIONS_WRITE = re.compile(r"(?:>\s*|\btee(?:\s+-a)?\s+)(?:\S*/)?decisions\.md(?![\w.-])")
 MARKDOWN_QUESTION = re.compile(r"^[ \t]*❓ \*\*Q\d+\*\*", re.M)
 
 
@@ -117,4 +117,6 @@ def main(path):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit("usage: question-stats <transcript.jsonl>")
     main(sys.argv[1])

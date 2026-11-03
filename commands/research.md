@@ -23,7 +23,7 @@ Map the relevant codebase based on the "Research Focus Areas" from the decisions
 - Capture findings with `file:line` references.
 - Compress findings — distill truth, don't dump raw file contents.
 - **Own the Open decisions.** For every decision marked `Firmness: Open` in decisions.md, gather the codebase evidence needed to resolve it and lay out the viable options with grounded tradeoffs. Do NOT silently pick one, and do NOT let it pass through unaddressed — an unowned Open decision is what later gets resolved arbitrarily. Surface each in the "Open Decisions" output section below so the user (not `/structure`) resolves it deliberately.
-- **Own the Deferred decisions.** For every bullet under decisions.md's `## Deferred`, gather the evidence and lay out the viable options with grounded tradeoffs, as for Open. Every bullet gets its own entry under "Deferred Decisions" (not "Open Decisions"), since these were never put to the user. Recommend nothing — no "(a) is the best fit" lean, in the file or in the reply. State each option's cost and benefit as plain facts, with no evaluative words ("arguably a defect", "conflicts with", "matches D1") that rank one option above another; if an existing D-entry bears on a bullet, state what it decided in one sentence before the options, not inside an option's tradeoffs, and still leave the choice open.
+- **Own the Deferred decisions.** For every bullet under decisions.md's `## Deferred` not yet marked resolved ("→ resolved as D<n>"), gather the evidence and lay out the viable options with grounded tradeoffs, as for Open. Every bullet gets its own entry under "Deferred Decisions" (not "Open Decisions"), since these were never put to the user. Recommend nothing — no "(a) is the best fit" lean, in the file or in the reply. State each option's cost and benefit as plain facts, with no evaluative words ("arguably a defect", "conflicts with", "matches D1") that rank one option above another; if an existing D-entry bears on a bullet, state what it decided in one sentence before the options, not inside an option's tradeoffs, and still leave the choice open.
 
 ## Output
 
@@ -56,7 +56,7 @@ Decisions: [decisions.md](decisions.md)
 
 ## Deferred Decisions (must be resolved before /structure)
 - **<Deferred bullet>:** <the viable options, with tradeoffs grounded in the findings above>. Still unresolved — the user picks before structuring (no option is recommended).
-- (one entry per bullet under decisions.md's `## Deferred`; omit this section only if there were none)
+- (one entry per unresolved bullet under decisions.md's `## Deferred`; omit this section only if there were none)
 ```
 
 Research findings are usually too long to dump inline. Print an outline instead: each focus area title with its finding count (e.g. `Rate limiting middleware — 4 findings`), plus whether Patterns Observed / Constraints Discovered sections have entries — not the finding bodies. Tell the user the file path (`$ARGUMENTS/research.md`) to read the full detail.

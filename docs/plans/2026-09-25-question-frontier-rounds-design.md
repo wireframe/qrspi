@@ -80,7 +80,7 @@ still applies.
 
 ### 4. When to stop
 
-Narrowed by [2026-11-02 question-deferred-decisions](2026-11-02-question-deferred-decisions/decisions.md): only decisions that are the user's to make, and that change what research reads, are asked; the rest are Deferred.
+The empty-frontier stop still applies after [2026-11-02 question-deferred-decisions](2026-11-02-question-deferred-decisions/decisions.md) (D2), but the frontier now holds only decisions that pass its ask test.
 
 Replace "when you have enough decisions" with: stop when the frontier is empty,
 meaning every branch has been visited and nothing is silently assumed. Then write

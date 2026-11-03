@@ -71,6 +71,19 @@ costs about $0.20 and takes under a minute:
     claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'research-*'
     claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'structure-*'
 
+## Measuring /qrspi:question
+
+`bin/question-stats` prints the question-phase counts for one Claude Code
+session transcript as JSON: questions asked before decisions.md was written
+(`picker_questions`, `markdown_questions`), D-entries, Deferred bullets and
+firmness levels. The old-vs-new replay in
+[comparison.md](../docs/plans/2026-11-02-question-deferred-decisions/comparison.md)
+used it. Run it on one transcript:
+
+    bin/question-stats ~/.claude/projects/<project>/<session>.jsonl
+
+Its tests run with `python3 -m unittest bin/test_question_stats.py`.
+
 ## Known issues
 
 - `question-first-round` is flaky: 2 of 3 runs passed on 2026-11-02 after the

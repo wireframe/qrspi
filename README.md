@@ -16,7 +16,7 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 ## Commands
 
 - **`/qrspi:question <topic>`** — Surface the decisions only you can make, in rounds with a recommended answer. Implementation choices are listed as Deferred for research. Writes `decisions.md`.
-- **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions, and lays out options for each Deferred decision (without recommending one) for you to pick before structuring. Writes `research.md`.
+- **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions, and lay out options for each Deferred decision (without recommending one) for you to pick before structuring. Writes `research.md`.
 - **`/qrspi:structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Phases describe goals, dependencies and verification; file paths are left to `/qrspi:plan`. Writes `structure.md`.
 - **`/qrspi:plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.
 - **`/qrspi:implement <plans-folder>`** — Execute the plan, dispatching each task's implementer and reviewers as subagents on pinned models (see [Models](#models)). A quality gate runs in a subagent after each phase, then a final whole-diff pass before the PR. Once the plan is done, drafts a pull request body from the plan's artifacts and opens it with `gh pr create`. Runs unattended from start to PR — review happens on the PR — stopping early only if a task is blocked.

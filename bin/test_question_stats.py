@@ -125,6 +125,16 @@ class QuestionStatsTest(unittest.TestCase):
         self.assertEqual(stats["decisions"], 2)
         self.assertEqual(stats["deferred"], 3)
 
+    def test_bash_tee_write_of_decisions_counts_as_the_write(self):
+        command = "tee d/decisions.md <<'EOF'\n" + DECISIONS_MD + "EOF"
+        stats = self.run_tool([user_command(), ask_user_question(2), tool_use("Bash", {"command": command})])
+        self.assertEqual(stats["decisions"], 2)
+
+    def test_missing_transcript_argument_prints_usage(self):
+        result = subprocess.run([sys.executable, TOOL], capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("usage: question-stats <transcript.jsonl>", result.stderr)
+
     def test_firmness_ignores_words_that_merely_start_with_a_level(self):
         write = write_decisions("## D1: X\n**Firmness:** Opening\n")
         stats = self.run_tool([user_command(), write])
