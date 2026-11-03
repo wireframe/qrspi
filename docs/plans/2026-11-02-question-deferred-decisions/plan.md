@@ -78,7 +78,7 @@ Eval command used below:
 
 ## Phase 2: /research owns Deferred decisions
 
-- [ ] Task 2.1: Red. New scaffolded case for research and Deferred
+- [x] Task 2.1: Red. New scaffolded case for research and Deferred
   - File: `evals/research-deferred/case.yaml`, `evals/research-deferred/fixture.sh`, `evals/research-deferred/prompt.md`, `evals/research-deferred/graders/wrote-deferred-section.md`, `evals/research-deferred/graders/deferred-handled.md` (all new)
   - Change:
     - `case.yaml`: copy `evals/implement-dispatch/case.yaml`, with `name: research-deferred`.
@@ -92,14 +92,14 @@ Eval command used below:
     - `deferred-handled.md`: an `llm` grader with `focus: trace`. PASS if research.md has a `## Deferred Decisions` section, separate from any Open Decisions section, with one entry per Deferred bullet (both bullets), each giving at least two options with tradeoffs and not picking one. The Deferred decisions must also be printed in full in the reply.
   - Test: `EVAL_SCAFFOLD --case research-deferred` fails against the current `commands/research.md`.
 
-- [ ] Task 2.2: Green. Make research own the Deferred decisions
+- [x] Task 2.2: Green. Make research own the Deferred decisions
   - File: `commands/research.md:13`, `commands/research.md:25`
   - Change:
     - `:13`: also note the `## Deferred` section.
     - After the Own-the-Open rule at `:25`, add "**Own the Deferred decisions.**". For every bullet under decisions.md's `## Deferred`, gather the evidence and lay out the viable options with grounded tradeoffs, the same way as for Open. Don't pick one. List each under "Deferred Decisions", separate from Open Decisions, because these were never put to the user.
   - Test: `grep -n 'Deferred' commands/research.md` hits `:13` and the new rule.
 
-- [ ] Task 2.3: Green. Add the output section, printing and write-back
+- [x] Task 2.3: Green. Add the output section, printing and write-back
   - File: `commands/research.md:52-59`, `commands/research.md:67`
   - Change:
     - In the template after Open Decisions, add:
@@ -112,7 +112,7 @@ Eval command used below:
     - `:67`: the gate caveat covers unresolved Open *or Deferred* decisions.
   - Test: `EVAL_SCAFFOLD --case research-deferred` passes.
 
-- [ ] Commit Phase 2
+- [x] Commit Phase 2
 
 ## Phase 3: /structure leaves file choices to /plan
 
