@@ -23,7 +23,7 @@ Map the relevant codebase based on the "Research Focus Areas" from the decisions
 - Capture findings with `file:line` references.
 - Compress findings — distill truth, don't dump raw file contents.
 - **Own the Open decisions.** For every decision marked `Firmness: Open` in decisions.md, gather the codebase evidence needed to resolve it and lay out the viable options with grounded tradeoffs. Do NOT silently pick one, and do NOT let it pass through unaddressed — an unowned Open decision is what later gets resolved arbitrarily. Surface each in the "Open Decisions" output section below so the user (not `/structure`) resolves it deliberately.
-- **Own the Deferred decisions.** For every bullet under decisions.md's `## Deferred`, gather the codebase evidence and lay out the viable options with grounded tradeoffs, as for Open. Do NOT pick one, and do NOT let any bullet pass through unaddressed — every bullet gets its own entry. Surface each under "Deferred Decisions", separate from "Open Decisions", since these were never put to the user.
+- **Own the Deferred decisions.** For every bullet under decisions.md's `## Deferred`, gather the codebase evidence and lay out the viable options with grounded tradeoffs, as for Open. Do NOT pick one — no recommended option, no "(a) is the best fit" lean, in the file or in the reply; if an existing D-entry bears on a bullet, state that as a fact and still leave the choice open. Do NOT let any bullet pass through unaddressed — every bullet gets its own entry. Surface each under "Deferred Decisions", separate from "Open Decisions", since these were never put to the user.
 
 ## Output
 
@@ -55,7 +55,7 @@ Decisions: [decisions.md](decisions.md)
 - (one entry per `Firmness: Open` decision; omit this section only if there were none)
 
 ## Deferred Decisions (must be resolved before /structure)
-- **<Deferred bullet>:** <the viable options, with tradeoffs grounded in the findings above>. Still unresolved — recommend the user pick before structuring.
+- **<Deferred bullet>:** <the viable options, with tradeoffs grounded in the findings above>. Still unresolved — the user picks before structuring (no option is recommended).
 - (one entry per bullet under decisions.md's `## Deferred`; omit this section only if there were none)
 ```
 
