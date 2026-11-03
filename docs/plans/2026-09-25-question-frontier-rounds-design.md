@@ -37,6 +37,8 @@ no-codebase rule, firmness inference, and the Continue Gate.
 
 ### 1. Interview loop
 
+Narrowed by [2026-11-02 question-deferred-decisions](2026-11-02-question-deferred-decisions/decisions.md): only decisions that are the user's to make, and that change what research reads, are asked; the rest are Deferred.
+
 Replaces "Ask ONE question at a time."
 
 - Model the decisions as a tree. Each round asks the frontier: every open decision
@@ -77,6 +79,8 @@ with the existing rules, and the single follow-up question for unclear firmness
 still applies.
 
 ### 4. When to stop
+
+The empty-frontier stop still applies after [2026-11-02 question-deferred-decisions](2026-11-02-question-deferred-decisions/decisions.md) (D2), but the frontier now holds only decisions that pass its ask test.
 
 Replace "when you have enough decisions" with: stop when the frontier is empty,
 meaning every branch has been visited and nothing is silently assumed. Then write

@@ -73,7 +73,6 @@ Research: [research.md](research.md)
 
 ## Phase 1: Version flag
 **Goal:** `tool.sh --version` prints the contents of `VERSION`.
-**Files touched:** `tool.sh`
 **Depends on:** nothing
 **Verification:** bash verify.sh
 

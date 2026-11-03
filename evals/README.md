@@ -53,15 +53,60 @@ costs about $0.70, since it goes through every Sonnet and Opus attempt.
 Runs end at the Open Pull Request step, because the fixture has no git remote.
 Graders check the work done before that point.
 
+## Phase cases
+
+`question-asks-only-yours` checks that `/qrspi:question`'s first round asks only
+questions that are the user's to make and that change what research reads (LLM
+judge):
+
+    claude plugin eval . --ablation none --no-publish --allow-tools Write --runs 3 --case question-asks-only-yours
+
+`research-deferred`, `structure-no-files` and `structure-vertical-slices` are
+scaffolded cases (`fixture.sh`). The first checks that `/qrspi:research` lays
+out options for every Deferred bullet without recommending one. The second
+checks that `/qrspi:structure` writes phases without a files field. The third
+gives `/qrspi:structure` a layered notes CLI whose plan includes a data
+migration and a release, and checks that every phase is a vertical slice with
+its docs inside it, with no storage-only first phase and no trailing release
+phase (LLM judge; 0 of 3 before the vertical-slice guidance, 3 of 3 after, on
+2026-11-03). `--case` takes one glob, so run research and structure
+separately. The scaffold flags are explained under Implement cases. Each run
+costs about $0.20 and takes under a minute:
+
+    claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'research-*'
+    claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'structure-*'
+
+## Measuring /qrspi:question
+
+`bin/question-stats` prints the question-phase counts for one Claude Code
+session transcript as JSON: questions asked before decisions.md was written
+(`picker_questions`, `markdown_questions`), D-entries, Deferred bullets and
+firmness levels. The old-vs-new replay in
+[comparison.md](../docs/plans/2026-11-02-question-deferred-decisions/comparison.md)
+used it. Run it on one transcript:
+
+    bin/question-stats ~/.claude/projects/<project>/<session>.jsonl
+
+Its tests run with `python3 -m unittest bin/test_question_stats.py`.
+
 ## Known issues
 
-- `question-first-round` is flaky: 1 of 3 runs passed at `--threshold 1` on
-  2026-09-27. The judge fails rounds that ask a primary-goal question next to
-  questions it shapes. For this topic the true first frontier is often the goal
-  question alone, which conflicts with the `multiple-questions` grader. A topic
-  whose first decisions really are independent would fix the test.
-- `question-examples-unneeded` passed 1 of 3 runs on 2026-10-02 with the Opus
-  judge. Failing runs add include/exclude restatements to the repo-scope
-  question ("includes active service repos and skips archived ones") even
-  though the description already states the rule. `question-examples-helpful`
-  passed 3 of 3.
+- `question-first-round` is flaky: 2 of 3 runs passed on 2026-11-02 after the
+  ask-test change (1 of 3 at `--threshold 1` on 2026-09-27). The judge fails
+  rounds that ask a primary-goal question next to questions it shapes. For this
+  topic the true first frontier is often the goal question alone, which
+  conflicts with the `multiple-questions` grader. A topic whose first decisions
+  really are independent would fix the test.
+- `question-asks-only-yours` has a flaky LLM judge: it passed 2 of 3 runs on
+  2026-11-03 with the default judge.
+- `question-decisions-output` passed 4 of 5 runs on 2026-11-03, after the
+  delegation rule regained "delegation never adds decisions you wouldn't have
+  asked". Without that clause it fell to 1 of 4.
+- `research-deferred` passed 5 of 5 runs on 2026-11-03, after research was told
+  to state tradeoffs as plain facts and the grader defined a lean. Before that,
+  judges split on factual tradeoffs.
+- `question-examples-unneeded` passed 1 of 3 runs on 2026-10-02 and 3 of 4 on
+  2026-11-02 with the Opus judge. Failing runs add include/exclude
+  restatements to the repo-scope question ("includes active service repos and
+  skips archived ones") even though the description already states the rule.
+  `question-examples-helpful` passed 3 of 3.

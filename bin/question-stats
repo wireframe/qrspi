@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+"""Print question-phase stats for one Claude Code transcript as JSON.
+
+Counts only the final /qrspi:question run that precedes the first decisions.md Write.
+"""
+import json
+import re
+import sys
+
+FIRMNESS_LEVELS = ("Firm", "Preference", "Open")
+QUESTION_START = re.compile(r"<command-name>/?qrspi:question</command-name>")
+DECISIONS_FILE = re.compile(r"(?:^|/)decisions\.md(?![\w.-])")
+BASH_DECISIONS_WRITE = re.compile(r"(?:>\s*|\btee(?:\s+-a)?\s+)(?:\S*/)?decisions\.md(?![\w.-])")
+MARKDOWN_QUESTION = re.compile(r"^[ \t]*❓ \*\*Q\d+\*\*", re.M)
+
+
+def load_records(path):
+    with open(path) as handle:
+        return [json.loads(line) for line in handle if line.strip()]
+
+
+def content_items(record):
+    content = (record.get("message") or {}).get("content")
+    if isinstance(content, str):
+        return [{"type": "text", "text": content}]
+    return content or []
+
+
+def items_in(records):
+    for record in records:
+        yield from content_items(record)
+
+
+def is_tool_call(item, name):
+    return item.get("type") == "tool_use" and item.get("name") == name
+
+
+def is_command_tag(item):
+    return item.get("type") == "text" and bool(QUESTION_START.search(item.get("text", "")))
+
+
+def is_skill_call(item):
+    return is_tool_call(item, "Skill") and item["input"]["skill"] == "qrspi:question"
+
+
+def is_question_start(record):
+    matches_start = is_command_tag if record.get("type") == "user" else is_skill_call
+    return any(matches_start(item) for item in content_items(record))
+
+
+def decisions_content(item):
+    """Return the decisions.md text this tool call writes, or None if it writes none."""
+    if is_tool_call(item, "Write") and DECISIONS_FILE.search(item["input"]["file_path"]):
+        return item["input"]["content"]
+    if is_tool_call(item, "Bash") and BASH_DECISIONS_WRITE.search(item["input"]["command"]):
+        return item["input"]["command"]
+    return None
+
+
+def find_decisions_write(records):
+    """Return (index, content) of the first decisions.md write, or (len(records), "") if never written."""
+    for index, record in enumerate(records):
+        for item in content_items(record):
+            content = decisions_content(item)
+            if content is not None:
+                return index, content
+    return len(records), ""
+
+
+def last_question_start(records):
+    starts = [i for i, record in enumerate(records) if is_question_start(record)]
+    if not starts:
+        raise ValueError("no /qrspi:question start found")
+    return starts[-1]
+
+
+def count_picker_questions(records):
+    return sum(len(item["input"]["questions"])
+               for item in items_in(records) if is_tool_call(item, "AskUserQuestion"))
+
+
+def count_markdown_questions(records):
+    assistant_records = (record for record in records if record.get("type") == "assistant")
+    return sum(len(MARKDOWN_QUESTION.findall(item["text"]))
+               for item in items_in(assistant_records) if item.get("type") == "text")
+
+
+def deferred_count(decisions):
+    section = re.search(r"^## Deferred\s*$(.*?)(?=^## |\Z)", decisions, re.M | re.S)
+    return len(re.findall(r"^\s*[-*] ", section.group(1), re.M)) if section else 0
+
+
+def decisions_stats(decisions):
+    return {
+        "decisions": len(re.findall(r"^## D\d+", decisions, re.M)),
+        "deferred": deferred_count(decisions),
+        "firmness": {level: len(re.findall(rf"\*\*Firmness:\*\* {level}\b", decisions))
+                     for level in FIRMNESS_LEVELS},
+    }
+
+
+def question_stats(records):
+    end, decisions = find_decisions_write(records)
+    window = records[last_question_start(records[:end]) + 1:end]
+    return {
+        "picker_questions": count_picker_questions(window),
+        "markdown_questions": count_markdown_questions(window),
+        **decisions_stats(decisions),
+    }
+
+
+def main(path):
+    try:
+        print(json.dumps(question_stats(load_records(path))))
+    except ValueError as error:
+        sys.exit(f"{error} in {path}")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit("usage: question-stats <transcript.jsonl>")
+    main(sys.argv[1])

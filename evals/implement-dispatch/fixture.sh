@@ -65,7 +65,6 @@ Research: [research.md](research.md)
 
 ## Phase 1: Greeting options
 **Goal:** `greet.sh` supports `--shout` and a default name.
-**Files touched:** `greet.sh`, `test.sh`
 **Depends on:** nothing
 **Verification:** bash test.sh
 
