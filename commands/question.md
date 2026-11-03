@@ -15,16 +15,20 @@ Surface design decisions by interviewing the user in **rounds**. Model the decis
 
 - Do NOT read the codebase. This phase is purely about intent and decisions.
 - Do NOT decide implementation details. DO describe each option's consequences concretely — illustrating what a choice leads to is not proposing an implementation.
-- Ask about: scope, approach, constraints, compatibility, tradeoffs, success criteria.
-- **Never ask the user a codebase fact.** If a question is about what the existing system already is or does (framework, datastore, existing middleware), don't ask it — add it to "Research Focus Areas" instead. If a decision hinges on that fact, record the decision as **Open**. Facts only the user knows (business constraints, consumers, deadlines) are fair to ask.
+- **Ask only what's the user's to make.** Put a decision to the user only if both hold:
+  - Only the user can answer it: their goal, scope boundary, hard constraints, success criteria, or facts only they know (a consumer, deadline or business rule counts only if research must inspect something because of it; otherwise don't ask it).
+  - Its answer changes what research reads. If research would read the same code whichever option is picked, it fails.
+- **Failing decisions are Deferred.** A decision that fails either condition (implementation choices, approaches, how to build it, behavior in edge cases the user didn't raise, tradeoffs that need codebase evidence) is never asked: list it under `## Deferred` as a one-line bullet, which /research lays out options for. A user-only fact that fails the test is simply not asked and not listed, since research can't lay out options for a fact. When a design choice hinges on something only the user knows, and that constraint passes the test, ask for the constraint instead of the design.
+- **Open vs Deferred.** **Open** is a decision that is the user's to make but can't be settled until research finds a fact. **Deferred** is a decision that isn't the user's to make up front, so it is never put to them.
+- **Never ask the user a codebase fact.** If a question is about what the existing system already is or does (framework, datastore, existing middleware), don't ask it — add it to "Research Focus Areas" instead. If a decision hinges on that fact, record the decision as **Open**.
 - **Capture firmness, not just the choice** (see below). Never record a casual aside, a "sure, I guess", a batch "all of them", or your own default as a firm decision.
 - When the interview stops (see Rounds), write the artifact immediately — do NOT ask for permission to write.
 
 ## Rounds
 
-- Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 mutually exclusive options for that one decision, with their tradeoffs in the option descriptions (see Writing Options) — no "several of these" option and no "also tell me…" add-ons. Put your recommended option first and end its label with "(Recommended)".
-- Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is either a codebase fact (don't ask it; record the decision Open, see Rules) or a prerequisite that belongs in an earlier round — not a hedge inside the recommendation. Anything the user must answer separately is its own question.
-- Hold a question for a later round if its options or recommendation would change based on another unsettled answer; ask shaping questions (a primary goal, an urgency driver) first. Two questions in one round never offer the same choice or cross-reference each other ("this decides…", "could override Q3").
+- Ask each round with one `AskUserQuestion` call of at most 4 questions. Give each question 2-4 mutually exclusive options for that one decision, with their tradeoffs in the option descriptions (see Writing Options) — no "several of these" option and no "also tell me…" add-ons. Options say what the choice means for the user and where research will look, and never prescribe how it would be built or illustrate an option with implementation specifics. Put your recommended option first and end its label with "(Recommended)".
+- Each question asks exactly one thing and carries one unconditional recommendation. If your recommendation would hinge on something unknown, that unknown is a codebase fact (don't ask it; record the decision Open, see Rules), a prerequisite that belongs in an earlier round, a decision that fails the ask test (list it under Deferred; don't ask it), or a user-only fact that fails it (leave it out) — not a hedge inside the recommendation. Anything the user must answer separately is its own question.
+- Hold a question for a later round if its options or recommendation would change based on another unsettled answer; ask shaping questions (a primary goal, a scope boundary) first. Two questions in one round never offer the same choice or cross-reference each other ("this decides…", "could override Q3").
 - If the frontier has more than 4 questions, ask the 4 most foundational now; the rest stay on the frontier for the next round.
 - After each round, recompute the frontier. Answers unblock new questions, and a surprising answer can reopen an earlier branch. A decision recorded **Open** counts as settled: record each decision that depends on it as **Open** too, with `Depends on:` pointing at it, instead of asking it.
 - If `AskUserQuestion` isn't available in this session, ask the round as numbered markdown in this format, with the recommendation only on the ➡️ line, then end the turn and wait for the user to answer by number:
@@ -87,7 +91,7 @@ Assigning firmness:
 - A drive-by suggestion ("while you're at it, also add X"), a batch answer ("all of them"), a shrug ("sure, whatever's normal"), or an answer that is itself a question ("do we even need that?") is **Preference** or **Open** — never Firm. Do NOT manufacture a rationale for it, and do NOT escalate it into a broader mandate.
 - If firmness is genuinely unclear and it matters downstream, ask ONE quick follow-up: "Is X a hard requirement, or a lean you're open to changing?"
 - Anything you decided yourself because the user didn't weigh in is **Preference** at most — record it as your default, not their requirement.
-- **Delegation settles the rest.** If the user hands the remaining decisions to you ("go with your recommendations", "wrap it up"), settle each remaining decision with your recommendation as **Preference**, or **Open** if it genuinely needs research, until the frontier is empty. Don't ask firmness follow-ups for delegated decisions.
+- **Delegation settles the rest.** If the user hands the remaining decisions to you ("go with your recommendations", "wrap it up"), settle each remaining decision that passes the ask test with your recommendation as **Preference**, or **Open** if it genuinely needs research, until the frontier is empty. Remaining decisions that fail the ask test go under Deferred, not recorded as decisions; delegation never adds decisions you wouldn't have asked. Don't ask firmness follow-ups for delegated decisions.
 - Every **Open** decision MUST also appear under "Research Focus Areas" — research owns resolving it.
 
 ## Output
@@ -111,6 +115,10 @@ Date: YYYY-MM-DD
 
 ## D2: ...
 (repeat for each decision)
+
+## Deferred
+- <a decision that isn't the user's to make up front; /research lays out options for it>
+(omit this section if nothing was deferred)
 
 ## Research Focus Areas
 - <scoped question for research phase to investigate>

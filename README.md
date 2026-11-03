@@ -15,7 +15,7 @@ Each phase writes a markdown artifact that the next phase reads, so a change goe
 
 ## Commands
 
-- **`/qrspi:question <topic>`** — Surface design decisions in rounds: each round asks every question whose prerequisites are settled, with a recommended answer. Writes `decisions.md`.
+- **`/qrspi:question <topic>`** — Surface the decisions only you can make, in rounds with a recommended answer. Implementation choices are listed as Deferred for research. Writes `decisions.md`.
 - **`/qrspi:research <plans-folder>`** — Research the codebase based on scoped questions from `/qrspi:question`'s decisions. Writes `research.md`.
 - **`/qrspi:structure <plans-folder>`** — Break the work into 3-5 independently testable phases based on research findings. Writes `structure.md`.
 - **`/qrspi:plan <plans-folder>`** — Create a detailed implementation plan with bite-sized tasks grouped by structure phases. Writes `plan.md`.

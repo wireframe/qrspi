@@ -11,5 +11,7 @@ PASS if all of these hold:
 - Every Open decision also appears under "Research Focus Areas".
 - "Research Focus Areas" lists at least one question about the existing codebase (for example, what API framework or middleware exists).
 - At least one decision's `**Depends on:**` names another decision (not every decision is `none`).
+- Implementation-level choices the user didn't raise (e.g. the rate-limit algorithm, response header names, the 429 body shape, the counter store) appear as one-line bullets under `## Deferred`, not as D-entries.
+- Every D-entry is a decision only the user could answer that changes what research reads (e.g. which clients or endpoints are limited).
 
 FAIL otherwise.
