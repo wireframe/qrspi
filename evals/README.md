@@ -65,7 +65,8 @@ judge):
 The first checks that `/qrspi:research` lays out options for every Deferred
 bullet without recommending one. The second checks that `/qrspi:structure`
 writes phases without a files field. `--case` takes one glob, so run them
-separately. Each run costs about $0.20 and takes under a minute:
+separately. The scaffold flags are explained under Implement cases. Each run
+costs about $0.20 and takes under a minute:
 
     claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'research-*'
     claude plugin eval . --ablation none --no-publish --trust-plugin --scaffold --runs 1 --allow-tools Write Edit Bash --case 'structure-*'
@@ -78,8 +79,14 @@ separately. Each run costs about $0.20 and takes under a minute:
   topic the true first frontier is often the goal question alone, which
   conflicts with the `multiple-questions` grader. A topic whose first decisions
   really are independent would fix the test.
-- `question-asks-only-yours` has a flaky LLM judge: it passes about 2 of 3 runs
-  at `--runs 3` with the default judge.
+- `question-asks-only-yours` has a flaky LLM judge: it passed 2 of 3 runs on
+  2026-11-03 with the default judge.
+- `question-decisions-output` passed 4 of 5 runs on 2026-11-03, after the
+  delegation rule regained "delegation never adds decisions you wouldn't have
+  asked". Without that clause it fell to 1 of 4.
+- `research-deferred` passed 5 of 5 runs on 2026-11-03, after research was told
+  to state tradeoffs as plain facts and the grader defined a lean. Before that,
+  judges split on factual tradeoffs.
 - `question-examples-unneeded` passed 1 of 3 runs on 2026-10-02 and 3 of 4 on
   2026-11-02 with the Opus judge. Failing runs add include/exclude
   restatements to the repo-scope question ("includes active service repos and

@@ -193,9 +193,9 @@ Serves Preference decisions D6 and D10, so it's kept minimal.
   - Change: `"version": "0.6.0"` → `"version": "0.7.0"`.
   - Test: `grep -n '"version": "0.7.0"' .claude-plugin/plugin.json`.
 
-- [ ] Task 5.4: Run the full suite
+- [x] Task 5.4: Run the full suite
   - File: none (verification only)
   - Change: Run the four question cases with `EVAL`, the scaffolded cases with `EVAL_SCAFFOLD --case 'research-*'`, `--case 'structure-*'` and `--case 'implement-*'`, and `python3 -m unittest bin/test_question_stats.py`.
   - Test: All pass, except the known-flaky cases, which must match their recorded baselines.
 
-- [ ] Commit Phase 5
+- [x] Commit Phase 5
