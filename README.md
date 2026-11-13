@@ -40,7 +40,7 @@ Run them in order on a new folder under `docs/plans/YYYY-MM-DD-<topic>/`:
 | `qrspi:implementer` | Implements a task; a stuck one is retried once on Opus before the task blocks | Sonnet (Opus on escalation) |
 | `qrspi:spec-reviewer` | Read-only check of a task against its spec | Haiku |
 | `qrspi:quality-reviewer` | Runs `/qrspi:code-review` on a task | Sonnet |
-| `qrspi:quality-gate` | Runs the phase Quality Gate and the final pass | Session model (`inherit`) |
+| `qrspi:quality-gate` | Runs the phase Quality Gate and the final pass | Opus (`opus`), pinned so a Fable session does not send the gate to Fable |
 
 - Model precedence: the Agent call's `model` parameter, then the agent file's `model:` frontmatter, then `CLAUDE_CODE_SUBAGENT_MODEL`, then the session model.
 - `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` overrides every pin.
